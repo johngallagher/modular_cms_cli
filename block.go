@@ -1,11 +1,41 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"gopkg.in/yaml.v3"
 )
+
+func parseBlock(blockData map[string]interface{}) (Block, error) {
+	typeStr, ok := blockData["type"].(string)
+	if !ok {
+		return nil, fmt.Errorf("block missing type field")
+	}
+
+	var block Block
+	switch typeStr {
+	case "FeatureSectionsCtaList":
+		block = &FeatureSectionsCtaList{Type: typeStr}
+	case "MarketingHeroCoverImageWithCtas":
+		block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
+	case "BlankBlock":
+		block = &BlankBlock{Type: typeStr}
+	default:
+		return nil, fmt.Errorf("unknown block type: %s", typeStr)
+	}
+
+	bytes, err := yaml.Marshal(blockData)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling block data: %v", err)
+	}
+	if err := yaml.Unmarshal(bytes, block); err != nil {
+		return nil, fmt.Errorf("error unmarshaling block: %v", err)
+	}
+
+	return block, nil
+}
 
 func AllBlocks() []Block {
 	yamlData, err := os.ReadFile("all_blocks.yml")
@@ -20,29 +50,9 @@ func AllBlocks() []Block {
 
 	blocks := make([]Block, len(raw))
 	for i, blockData := range raw {
-		typeStr, ok := blockData["type"].(string)
-		if !ok {
-			log.Fatalf("block %d missing type field", i)
-		}
-
-		var block Block
-		switch typeStr {
-		case "FeatureSectionsCtaList":
-			block = &FeatureSectionsCtaList{Type: typeStr}
-		case "MarketingHeroCoverImageWithCtas":
-			block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
-		case "BlankBlock":
-			block = &BlankBlock{Type: typeStr}
-		default:
-			log.Fatalf("unknown block type: %s", typeStr)
-		}
-
-		bytes, err := yaml.Marshal(blockData)
+		block, err := parseBlock(blockData)
 		if err != nil {
-			log.Fatal(err)
-		}
-		if err := yaml.Unmarshal(bytes, block); err != nil {
-			log.Fatal(err)
+			log.Fatalf("error parsing block %d: %v", i, err)
 		}
 		blocks[i] = block
 	}

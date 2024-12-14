@@ -65,29 +65,9 @@ func PageFromMarkdown(mdData []byte) (*Page, error) {
 		blocks := make([]Block, 0, len(blocksData))
 		for i, blockData := range blocksData {
 			if blockMap, ok := blockData.(map[string]interface{}); ok {
-				typeStr, ok := blockMap["type"].(string)
-				if !ok {
-					return nil, fmt.Errorf("block %d missing type field", i)
-				}
-
-				var block Block
-				switch typeStr {
-				case "FeatureSectionsCtaList":
-					block = &FeatureSectionsCtaList{Type: typeStr}
-				case "MarketingHeroCoverImageWithCtas":
-					block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
-				case "BlankBlock":
-					block = &BlankBlock{Type: typeStr}
-				default:
-					return nil, fmt.Errorf("unknown block type: %s", typeStr)
-				}
-
-				blockBytes, err := yaml.Marshal(blockMap)
+				block, err := parseBlock(blockMap)
 				if err != nil {
-					return nil, fmt.Errorf("error re-marshaling block: %v", err)
-				}
-				if err := yaml.Unmarshal(blockBytes, block); err != nil {
-					return nil, fmt.Errorf("error parsing block: %v", err)
+					return nil, fmt.Errorf("error parsing block %d: %v", i, err)
 				}
 				blocks = append(blocks, block)
 			}
