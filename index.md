@@ -1,7 +1,7 @@
 ---
-blocks: []
-layout: page.webc
 type: Page
+layout: page.webc
+blocks: []
 ---
 
 # Heading

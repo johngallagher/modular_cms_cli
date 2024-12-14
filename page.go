@@ -53,15 +53,51 @@ func PageFromMarkdown(mdData []byte) (*Page, error) {
 		return nil, fmt.Errorf("invalid markdown file format - missing frontmatter (got %d parts, expected at least 3)", len(parts))
 	}
 
-	// Parse YAML frontmatter
-	var page Page
-	if err := yaml.Unmarshal(parts[1], &page); err != nil {
+	// Parse YAML frontmatter into intermediate map
+	var frontmatter map[string]interface{}
+	if err := yaml.Unmarshal(parts[1], &frontmatter); err != nil {
 		return nil, fmt.Errorf("error parsing frontmatter: %v", err)
+	}
+
+	// Create page and handle blocks specially
+	page := &Page{}
+	if blocksData, ok := frontmatter["blocks"].([]interface{}); ok {
+		blocks := make([]Block, 0, len(blocksData))
+		for i, blockData := range blocksData {
+			if blockMap, ok := blockData.(map[string]interface{}); ok {
+				typeStr, ok := blockMap["type"].(string)
+				if !ok {
+					return nil, fmt.Errorf("block %d missing type field", i)
+				}
+
+				var block Block
+				switch typeStr {
+				case "FeatureSectionsCtaList":
+					block = &FeatureSectionsCtaList{Type: typeStr}
+				case "MarketingHeroCoverImageWithCtas":
+					block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
+				case "BlankBlock":
+					block = &BlankBlock{Type: typeStr}
+				default:
+					return nil, fmt.Errorf("unknown block type: %s", typeStr)
+				}
+
+				blockBytes, err := yaml.Marshal(blockMap)
+				if err != nil {
+					return nil, fmt.Errorf("error re-marshaling block: %v", err)
+				}
+				if err := yaml.Unmarshal(blockBytes, block); err != nil {
+					return nil, fmt.Errorf("error parsing block: %v", err)
+				}
+				blocks = append(blocks, block)
+			}
+		}
+		page.Blocks = blocks
 	}
 
 	page.Content = string(parts[2])
 
-	return &page, nil
+	return page, nil
 }
 
 func (p *Page) AppendBlankBlock() {

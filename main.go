@@ -8,8 +8,12 @@ import (
 	"github.com/ktr0731/go-fuzzyfinder"
 )
 
+var filename = "../modular_cms/src/index.md"
+
+// var filename = "index.md"
+
 func main() {
-	mdData, err := os.ReadFile("index.md")
+	mdData, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,11 +36,11 @@ func main() {
 		fuzzyfinder.WithPreviewWindow(func(i, w, h int) string {
 			if i == -1 {
 				page.Blocks[existingBlocksLength-1] = &BlankBlock{Type: "BlankBlock"}
-				page.WriteToFile("index.md")
+				page.WriteToFile(filename)
 				return ""
 			}
 			page.Blocks[existingBlocksLength-1] = blocks[i]
-			page.WriteToFile("index.md")
+			page.WriteToFile(filename)
 			return fmt.Sprintf("Block: %s", blocks[i].DisplayName())
 		}))
 	if err != nil {
