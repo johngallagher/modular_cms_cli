@@ -83,3 +83,7 @@ func PageFromMarkdown(mdData []byte) (*Page, error) {
 func (p *Page) AppendBlankBlock() {
 	p.Blocks = append(p.Blocks, &BlankBlock{Type: "BlankBlock"})
 }
+
+func (p *Page) SingleUseBlocks() []Block {
+	return p.Blocks // All blocks are single use for now
+}

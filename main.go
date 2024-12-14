@@ -22,7 +22,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	blocks := AllBlocks()
+	allBlocks := AllBlocks()
+	singleUseBlocks := page.SingleUseBlocks()
+
+	blocks := removeBlocks(allBlocks, singleUseBlocks)
 
 	page.AppendBlankBlock()
 	existingBlocks := page.Blocks

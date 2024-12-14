@@ -8,6 +8,17 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func removeBlocks(allBlocks []Block, singleUseBlocks []Block) []Block {
+	for _, singleUseBlock := range singleUseBlocks {
+		for i, block := range allBlocks {
+			if block.DisplayName() == singleUseBlock.DisplayName() {
+				allBlocks = append(allBlocks[:i], allBlocks[i+1:]...)
+			}
+		}
+	}
+	return allBlocks
+}
+
 func parseBlock(blockData map[string]interface{}) (Block, error) {
 	typeStr, ok := blockData["type"].(string)
 	if !ok {
