@@ -20,6 +20,14 @@ func parseBlock(blockData map[string]interface{}) (Block, error) {
 		block = &FeatureSectionsCtaList{Type: typeStr}
 	case "MarketingHeroCoverImageWithCtas":
 		block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
+	case "FeatureSectionsIcons":
+		block = &FeatureSectionsIcons{Type: typeStr}
+	case "FeatureSectionsCardList":
+		block = &FeatureSectionsCardList{Type: typeStr}
+	case "PricingTable":
+		block = &PricingTable{Type: typeStr}
+	case "FaqSectionsAccordion":
+		block = &FaqSectionsAccordion{Type: typeStr}
 	case "BlankBlock":
 		block = &BlankBlock{Type: typeStr}
 	default:
@@ -118,4 +126,60 @@ func (m *MarketingHeroCoverImageWithCtas) DisplayName() string {
 
 func (f *FeatureSectionsCtaList) DisplayName() string {
 	return "Feature Sections Cta List"
+}
+
+type FeatureSectionsIcons struct {
+	Type     string    `yaml:"type"`
+	Library  string    `yaml:"library"`
+	Heading  string    `yaml:"heading"`
+	Features []Feature `yaml:"features"`
+}
+
+func (f *FeatureSectionsIcons) DisplayName() string {
+	return "Feature Sections Icons"
+}
+
+type FeatureSectionsCardList struct {
+	Type     string    `yaml:"type"`
+	Library  string    `yaml:"library"`
+	Heading  string    `yaml:"heading"`
+	Features []Feature `yaml:"features"`
+}
+
+func (f *FeatureSectionsCardList) DisplayName() string {
+	return "Feature Sections Card List"
+}
+
+type PricingTable struct {
+	Type       string    `yaml:"type"`
+	Library    string    `yaml:"library"`
+	Heading    string    `yaml:"heading"`
+	Subheading string    `yaml:"subheading"`
+	Products   []Product `yaml:"products"`
+}
+
+func (p *PricingTable) DisplayName() string {
+	return "Pricing Table"
+}
+
+type Product struct {
+	ID            string `yaml:"id"`
+	PaymentLinkID string `yaml:"payment_link_id"`
+}
+
+type FaqSectionsAccordion struct {
+	Type       string     `yaml:"type"`
+	Library    string     `yaml:"library"`
+	Heading    string     `yaml:"heading"`
+	Subheading string     `yaml:"subheading"`
+	Questions  []Question `yaml:"questions"`
+}
+
+func (f *FaqSectionsAccordion) DisplayName() string {
+	return "Faq Sections Accordion"
+}
+
+type Question struct {
+	Question string `yaml:"question"`
+	Answer   string `yaml:"answer"`
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/ktr0731/go-fuzzyfinder"
 )
 
-var filename = "../modular_cms/src/index.md"
+// var filename = "../modular_cms/src/index.md"
 
-// var filename = "index.md"
+var filename = "index.md"
 
 func main() {
 	mdData, err := os.ReadFile(filename)
