@@ -44,6 +44,10 @@
 - name: bar
   albumname: album1
   artist: artist1
+- name: baz
+  albumname: album3
+  artist: artist2
+
 ---
 
 # Heading

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -35,30 +36,58 @@ func rejectEmpty(tracks []Track) []Track {
 	return filteredTracks
 }
 
-func writeTracksToFile(tracks []Track) error {
+func writeTracksToFile(tracks []Track, content string) error {
 	yaml, err := yaml.Marshal(rejectEmpty(tracks))
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile("albums.yaml", yaml, 0644); err != nil {
+
+	content = fmt.Sprintf("---\n%s\n---\n%s", yaml, content)
+	if err := os.WriteFile("albums.md", []byte(content), 0644); err != nil {
 		log.Fatalf("Error writing tracks to file: %v", err)
 		return err
 	}
 	return nil
 }
 
-func main() {
-
-	yamlData, err := os.ReadFile("albums.yaml")
-	if err != nil && !os.IsNotExist(err) {
-		log.Fatalf("Error reading albums.yaml: %v", err)
+func readTracksFromMarkdown(mdData []byte) ([]Track, error) {
+	// Split frontmatter from content
+	parts := bytes.Split(mdData, []byte("---\n"))
+	if len(parts) < 3 {
+		return nil, fmt.Errorf("invalid markdown file format - missing frontmatter")
 	}
 
-	var existingTracks []Track
-	if len(yamlData) > 0 {
-		if err := yaml.Unmarshal(yamlData, &existingTracks); err != nil {
-			log.Fatalf("Error parsing albums.yaml: %v", err)
-		}
+	// Parse YAML frontmatter
+	var mdTracks []Track
+	if err := yaml.Unmarshal(parts[1], &mdTracks); err != nil {
+		return nil, fmt.Errorf("error parsing frontmatter: %v", err)
+	}
+
+	return mdTracks, nil
+}
+
+func readContentFromMarkdown(mdData []byte) (string, error) {
+	parts := bytes.Split(mdData, []byte("---\n"))
+	if len(parts) < 3 {
+		return "", fmt.Errorf("invalid markdown file format - missing frontmatter")
+	}
+	return string(parts[2]), nil
+}
+
+func main() {
+	mdData, err := os.ReadFile("albums.md")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	existingTracks, err := readTracksFromMarkdown(mdData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	content, err := readContentFromMarkdown(mdData)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	existingTracks = append(existingTracks, emptyTrack)
@@ -72,13 +101,13 @@ func main() {
 		fuzzyfinder.WithPreviewWindow(func(i, w, h int) string {
 			if i == -1 {
 				existingTracks[existingTracksLength-1] = emptyTrack
-				writeTracksToFile(existingTracks)
+				writeTracksToFile(existingTracks, content)
 				return ""
 			}
 			track := tracks[i]
 
 			existingTracks[existingTracksLength-1] = track
-			writeTracksToFile(existingTracks)
+			writeTracksToFile(existingTracks, content)
 
 			return fmt.Sprintf("Track: %s (%s)\nAlbum: %s",
 				tracks[i].Name,
