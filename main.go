@@ -67,8 +67,6 @@ func addBlock() {
 		},
 		fuzzyfinder.WithPreviewWindow(func(i, w, h int) string {
 			if i == -1 {
-				page.Blocks[existingBlocksLength-1] = &BlankBlock{Type: "BlankBlock"}
-				page.WriteToFile(filename)
 				return ""
 			}
 			page.Blocks[existingBlocksLength-1] = blocks[i]
@@ -76,6 +74,9 @@ func addBlock() {
 			return fmt.Sprintf("Block: %s", blocks[i].DisplayName())
 		}))
 	if err != nil {
+		// Remove the blank block if user cancels
+		page.Blocks = page.Blocks[:existingBlocksLength-1]
+		page.WriteToFile(filename)
 		log.Fatal(err)
 	}
 	fmt.Printf("selected: %v\n", idx)
