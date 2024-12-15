@@ -13,6 +13,35 @@ var filename = "../modular_cms/src/index.md"
 // var filename = "index.md"
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: modular <command> <subcommand>")
+		fmt.Println("Commands: block")
+		os.Exit(1)
+	}
+
+	command := os.Args[1]
+	if command == "block" {
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: modular block <subcommand>")
+			fmt.Println("Subcommands: add")
+			os.Exit(1)
+		}
+
+		subcommand := os.Args[2]
+		switch subcommand {
+		case "add":
+			addBlock()
+		default:
+			fmt.Printf("Unknown subcommand: %s\n", subcommand)
+			os.Exit(1)
+		}
+	} else {
+		fmt.Printf("Unknown command: %s\n", command)
+		os.Exit(1)
+	}
+}
+
+func addBlock() {
 	mdData, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
