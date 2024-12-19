@@ -99,6 +99,7 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			featureItem := FeatureItem{feature: newFeature}
 			m.List.InsertItem(len(m.List.Items()), featureItem)
 
+			m.Parent.LandingPage.Write()
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewInput().

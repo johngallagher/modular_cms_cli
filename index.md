@@ -19,10 +19,12 @@ blocks:
       image:
         url: https://images.unsplash.com/photo-1448932223592-d1fc686e76ea
       features:
+        - name: Wow
+          description: Aarom
         - name: New Feature
           description: New Feature Description
-        - name: New Feature
-          description: New Feature Description
+        - name: Great
+          description: Scott
 layout: page.webc
 type: Page
 ---
