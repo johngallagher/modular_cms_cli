@@ -15,16 +15,12 @@ import (
 // editCmd represents the edit command
 var editCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Edit a page",
+	Long:  "Edit a page",
 	Run: func(cmd *cobra.Command, args []string) {
 		filePath, _ := cmd.Flags().GetString("file")
 
+		fmt.Print("\033[H\033[2J") // Clear screen
 		p := tea.NewProgram(modular.InitialModel(filePath))
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Error running program: %v", err)

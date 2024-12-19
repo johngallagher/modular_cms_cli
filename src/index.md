@@ -2,7 +2,7 @@
 blocks:
     - type: MarketingHeroCoverImageWithCtas
       hide_from_nav: true
-      heading: Understand your App
+      heading: Understand your App In Production
       subheading: Stop guessing and understand what on earth your Rails app is **actually doing**.
       left:
         heading: 3 February 2025

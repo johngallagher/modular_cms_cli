@@ -12,20 +12,13 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "modular",
-	Short: "A tool for editing modular pages",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Short: "CLI tool to build static sites with components in seconds",
+	Long:  "Convention over configuration for static sites. GUI landing page builders are clumsy, slow, bug ridden and annoying to use for engineers. Static site builders are better, but setting one up requires hours of research and fiddling with hundreds of options. Modular is a CLI driven CMS that allows you to build fast, beautiful landing pages with your favorite component system in seconds.",
+	// Run: func(cmd *cobra.Command, args []string) {
+	// 	pageCmd.Run(cmd, args)
+	// },
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -42,5 +35,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
