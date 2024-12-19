@@ -2,82 +2,90 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
-	"github.com/ktr0731/go-fuzzyfinder"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-var filename = "../modular_cms/src/index.md"
-
-// var filename = "index.md"
-
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: modular <command> <subcommand>")
-		fmt.Println("Commands: block")
-		os.Exit(1)
-	}
-
-	command := os.Args[1]
-	if command == "block" {
-		if len(os.Args) < 3 {
-			fmt.Println("Usage: modular block <subcommand>")
-			fmt.Println("Subcommands: add")
-			os.Exit(1)
-		}
-
-		subcommand := os.Args[2]
-		switch subcommand {
-		case "add":
-			addBlock()
-		default:
-			fmt.Printf("Unknown subcommand: %s\n", subcommand)
-			os.Exit(1)
-		}
-	} else {
-		fmt.Printf("Unknown command: %s\n", command)
-		os.Exit(1)
-	}
+// Feature represents a detailed item within a block
+type Feature struct {
+	Name        string
+	Description string
 }
 
-func addBlock() {
-	mdData, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
+// MainModel is the root model managing app state
+type MainModel struct {
+	NavigationCtx *NavigationContext
+	ModelStack    *ModelStack
+	LandingPage   *LandingPage
+	width         int
+	height        int
+}
+
+// Factory
+func initialModel() *MainModel {
+	navCtx := &NavigationContext{Path: []string{"Home"}}
+	landingPage := NewLandingPage()
+
+	m := &MainModel{
+		NavigationCtx: navCtx,
+		ModelStack:    NewModelStack(),
+		LandingPage:   landingPage,
 	}
-	page, err := PageFromMarkdown(mdData)
-	if err != nil {
-		log.Fatal(err)
+
+	// Initialize with block list view
+	blockList := m.createBlockListModel()
+	m.ModelStack.Push(blockList)
+	return m
+}
+
+// Init
+func (m *MainModel) Init() tea.Cmd {
+	return nil
+}
+
+// Update
+func (m *MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
 	}
 
-	allBlocks := AllBlocks()
-	singleUseBlocks := page.SingleUseBlocks()
-
-	blocks := removeBlocks(allBlocks, singleUseBlocks)
-
-	page.AppendBlankBlock()
-	existingBlocks := page.Blocks
-	existingBlocksLength := len(existingBlocks)
-
-	idx, err := fuzzyfinder.FindMulti(
-		blocks,
-		func(i int) string {
-			return blocks[i].DisplayName()
-		},
-		fuzzyfinder.WithPreviewWindow(func(i, w, h int) string {
-			if i == -1 {
-				return ""
-			}
-			page.Blocks[existingBlocksLength-1] = blocks[i]
-			page.WriteToFile(filename)
-			return fmt.Sprintf("Block: %s", blocks[i].DisplayName())
-		}))
-	if err != nil {
-		// Remove the blank block if user cancels
-		page.Blocks = page.Blocks[:existingBlocksLength-1]
-		page.WriteToFile(filename)
-		log.Fatal(err)
+	if m.ModelStack.IsEmpty() {
+		return m, tea.Quit
 	}
-	fmt.Printf("selected: %v\n", idx)
+
+	current := m.ModelStack.Current()
+	updatedModel, cmd := current.Update(msg)
+
+	// If the updated model is different from the current one,
+	// it means we need to switch models
+	if updatedModel != current {
+		if updatedModel == nil {
+			// Pop the current model if nil is returned
+			m.ModelStack.Pop()
+		} else {
+			// Push the new model
+			m.ModelStack.Push(updatedModel)
+		}
+	}
+
+	return m.ModelStack.Current(), cmd
+}
+
+// View
+func (m *MainModel) View() string {
+	if m.ModelStack.IsEmpty() {
+		return "No active views"
+	}
+	return m.ModelStack.Current().View()
+}
+
+// Main function to run the application
+func main() {
+	if _, err := tea.NewProgram(initialModel(), tea.WithAltScreen()).Run(); err != nil {
+		fmt.Println("Error running program:", err)
+		os.Exit(1)
+	}
 }

@@ -1,82 +1,45 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"os"
-
-	"gopkg.in/yaml.v3"
-)
-
-func removeBlocks(allBlocks []Block, singleUseBlocks []Block) []Block {
-	for _, singleUseBlock := range singleUseBlocks {
-		for i, block := range allBlocks {
-			if block.DisplayName() == singleUseBlock.DisplayName() {
-				allBlocks = append(allBlocks[:i], allBlocks[i+1:]...)
-			}
-		}
-	}
-	return allBlocks
+// Model definition
+type Block struct {
+	id          string
+	title       string
+	features    []Feature
+	description string
 }
 
-func parseBlock(blockData map[string]interface{}) (Block, error) {
-	typeStr, ok := blockData["type"].(string)
-	if !ok {
-		return nil, fmt.Errorf("block missing type field")
-	}
+// type FieldDefinition struct {
+// 	Key   string
+// 	Title string
+// 	Type  string
+// 	// Value func(block BlockInterface) *string
+// }
 
-	var block Block
-	switch typeStr {
-	case "FeatureSectionsCtaList":
-		block = &FeatureSectionsCtaList{Type: typeStr}
-	case "MarketingHeroCoverImageWithCtas":
-		block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
-	case "FeatureSectionsIcons":
-		block = &FeatureSectionsIcons{Type: typeStr}
-	case "FeatureSectionsCardList":
-		block = &FeatureSectionsCardList{Type: typeStr}
-	case "PricingTable":
-		block = &PricingTable{Type: typeStr}
-	case "FaqSectionsAccordion":
-		block = &FaqSectionsAccordion{Type: typeStr}
-	case "BlankBlock":
-		block = &BlankBlock{Type: typeStr}
-	default:
-		return nil, fmt.Errorf("unknown block type: %s", typeStr)
-	}
-
-	bytes, err := yaml.Marshal(blockData)
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling block data: %v", err)
-	}
-	if err := yaml.Unmarshal(bytes, block); err != nil {
-		return nil, fmt.Errorf("error unmarshaling block: %v", err)
-	}
-
-	return block, nil
+type BlockInterface interface {
+	ID() string
+	Type() string
+	Title() string
+	Description() string
+	DescriptionPointer() *string
+	GetFieldDefinitions() []*FieldDefinition
+	GetFeatures() []Feature
+	FilterValue() string
 }
 
-func AllBlocks() []Block {
-	yamlData, err := os.ReadFile("all_blocks.yml")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (b Block) FilterValue() string {
+	return b.title
+}
 
-	var raw []map[string]interface{}
-	if err := yaml.Unmarshal(yamlData, &raw); err != nil {
-		log.Fatal(err)
-	}
+func (b Block) Title() string {
+	return b.title
+}
 
-	blocks := make([]Block, len(raw))
-	for i, blockData := range raw {
-		block, err := parseBlock(blockData)
-		if err != nil {
-			log.Fatalf("error parsing block %d: %v", i, err)
-		}
-		blocks[i] = block
-	}
+func (b Block) Description() string {
+	return b.description
+}
 
-	return blocks
+func (b Block) DescriptionPointer() *string {
+	return &b.description
 }
 
 type CTA struct {
@@ -94,45 +57,23 @@ type Image struct {
 	URL string `yaml:"url"`
 }
 
-type MarketingHeroCoverImageWithCtas struct {
-	Type        string `yaml:"type"`
-	HideFromNav bool   `yaml:"hide_from_nav"`
-	Heading     string `yaml:"heading"`
-	Subheading  string `yaml:"subheading"`
-	Left        Side   `yaml:"left"`
-	Right       Side   `yaml:"right"`
-	Image       Image  `yaml:"image"`
-}
-
-type Feature struct {
+type NewFeature struct {
 	Heading string `yaml:"heading"`
 	Summary string `yaml:"summary"`
 	Icon    string `yaml:"icon"`
 }
 
 type FeatureSectionsCtaList struct {
-	Type        string    `yaml:"type"`
-	HideFromNav bool      `yaml:"hide_from_nav"`
-	Heading     string    `yaml:"heading"`
-	Subheading  string    `yaml:"subheading"`
-	Features    []Feature `yaml:"features"`
-	Library     string    `yaml:"library"`
+	Type        string       `yaml:"type"`
+	HideFromNav bool         `yaml:"hide_from_nav"`
+	Heading     string       `yaml:"heading"`
+	Subheading  string       `yaml:"subheading"`
+	Features    []NewFeature `yaml:"features"`
+	Library     string       `yaml:"library"`
 }
 
 type BlankBlock struct {
 	Type string `yaml:"type"`
-}
-
-func (b *BlankBlock) DisplayName() string {
-	return ""
-}
-
-type Block interface {
-	DisplayName() string
-}
-
-func (m *MarketingHeroCoverImageWithCtas) DisplayName() string {
-	return "Marketing Hero Cover Image With Ctas"
 }
 
 func (f *FeatureSectionsCtaList) DisplayName() string {
@@ -140,10 +81,10 @@ func (f *FeatureSectionsCtaList) DisplayName() string {
 }
 
 type FeatureSectionsIcons struct {
-	Type     string    `yaml:"type"`
-	Library  string    `yaml:"library"`
-	Heading  string    `yaml:"heading"`
-	Features []Feature `yaml:"features"`
+	Type     string       `yaml:"type"`
+	Library  string       `yaml:"library"`
+	Heading  string       `yaml:"heading"`
+	Features []NewFeature `yaml:"features"`
 }
 
 func (f *FeatureSectionsIcons) DisplayName() string {
@@ -151,10 +92,10 @@ func (f *FeatureSectionsIcons) DisplayName() string {
 }
 
 type FeatureSectionsCardList struct {
-	Type     string    `yaml:"type"`
-	Library  string    `yaml:"library"`
-	Heading  string    `yaml:"heading"`
-	Features []Feature `yaml:"features"`
+	Type     string       `yaml:"type"`
+	Library  string       `yaml:"library"`
+	Heading  string       `yaml:"heading"`
+	Features []NewFeature `yaml:"features"`
 }
 
 func (f *FeatureSectionsCardList) DisplayName() string {
