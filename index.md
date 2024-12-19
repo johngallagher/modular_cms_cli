@@ -25,6 +25,10 @@ blocks:
           description: New Feature Description
         - name: Great
           description: Scott
+        - name: New Feature
+          description: New Feature Description
+        - name: New Feature
+          description: New Feature Description
 layout: page.webc
 type: Page
 ---

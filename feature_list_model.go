@@ -26,6 +26,7 @@ func (m *MainModel) createFeatureListModel(block BlockInterface, features []Feat
 	l.SetShowStatusBar(true)
 	l.SetFilteringEnabled(true)
 	l.SetShowHelp(true)
+	l.SetSize(m.width, m.height-3)
 
 	return &FeatureListModel{
 		Block:         block,
