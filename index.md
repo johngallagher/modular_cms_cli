@@ -2,8 +2,8 @@
 blocks:
     - type: MarketingHeroCoverImageWithCtas
       hide_from_nav: true
-      heading: Understand your Rails app **in production**
-      subheading: Stop guessing and understand what your Rails app is **actually doing** in production.
+      heading: Understand your Rails Legacy App
+      subheading: Stop guessing and understand what your Rails app
       left:
         heading: 3 February 2025
         subheading: 6 Weeks Workshop. Hands On And Practical. No DevOps Experience Needed. Less Than 4 Hours A Week. Designed For Seniors And Leads. Solo Or Team Workshops.

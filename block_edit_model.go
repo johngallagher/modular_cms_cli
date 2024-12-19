@@ -17,8 +17,6 @@ type BlockEditModel struct {
 
 // Factory
 func (m *MainModel) createBlockEditModel(block BlockInterface) *BlockEditModel {
-	// Create form fields from field definitions
-
 	fields := make([]huh.Field, 0)
 	for _, def := range block.GetFieldDefinitions() {
 		fields = append(fields, def.CreateFormField(block, m))
@@ -57,6 +55,7 @@ func (m *BlockEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmd tea.Cmd
 
+	m.Parent.LandingPage.WriteToFile("index.md")
 	model, cmd := m.Form.Update(msg)
 	m.Form = model.(*huh.Form)
 

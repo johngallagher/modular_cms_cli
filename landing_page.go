@@ -36,6 +36,29 @@ func LandingPageFromMarkdownAtPath(path string) *LandingPage {
 	}
 }
 
+func (lp LandingPage) WriteToFile(path string) error {
+	frontmatter := map[string]interface{}{
+		"type":   "Page",
+		"layout": "page.webc",
+		"blocks": lp.Blocks,
+	}
+	yaml, err := yaml.Marshal(frontmatter)
+	if err != nil {
+		return fmt.Errorf("error marshaling frontmatter: %v", err)
+	}
+
+	// Combine frontmatter and content
+	content := fmt.Sprintf("---\n%s---\n%s", yaml, lp.Content)
+
+	// Write to file
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		return fmt.Errorf("error writing file: %v", err)
+	}
+
+	return nil
+
+}
+
 func ParseBlocksAndContent(markdown []byte) ([]BlockInterface, string) {
 	// Split frontmatter from content
 	parts := bytes.Split(markdown, []byte("---\n"))
@@ -78,7 +101,7 @@ func ParseBlock(blockData map[string]interface{}) (BlockInterface, error) {
 	// case "FeatureSectionsCtaList":
 	// 	block = &FeatureSectionsCtaList{Type: typeStr}
 	case "MarketingHeroCoverImageWithCtas":
-		block = &MarketingHeroCoverImageWithCtas{_type: typeStr}
+		block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
 	// case "FeatureSectionsIcons":
 	// 	block = &FeatureSectionsIcons{Type: typeStr}
 	// case "FeatureSectionsCardList":

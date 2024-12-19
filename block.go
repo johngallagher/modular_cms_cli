@@ -17,7 +17,6 @@ type Block struct {
 
 type BlockInterface interface {
 	ID() string
-	Type() string
 	Title() string
 	Description() string
 	DescriptionPointer() *string

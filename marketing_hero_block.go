@@ -2,7 +2,7 @@ package main
 
 // MarketingHeroCoverImageWithCtas represents a marketing hero block with CTAs
 type MarketingHeroCoverImageWithCtas struct {
-	_type       string    `yaml:"type"`
+	Type        string    `yaml:"type"`
 	HideFromNav bool      `yaml:"hide_from_nav"`
 	Heading     string    `yaml:"heading"`
 	Subheading  string    `yaml:"subheading"`
@@ -40,10 +40,6 @@ func (b MarketingHeroCoverImageWithCtas) GetFeatures() []Feature {
 	return b.Features
 }
 
-func (b MarketingHeroCoverImageWithCtas) Type() string {
-	return b._type
-}
-
 func (b MarketingHeroCoverImageWithCtas) ID() string {
 	return "marketing_hero_cover_image_with_ctas"
 }
@@ -68,7 +64,7 @@ func (b *MarketingHeroCoverImageWithCtas) GetFieldDefinitions() []*FieldDefiniti
 // NewMarketingHeroCoverImageWithCtas creates a new marketing hero block with default values
 func NewMarketingHeroCoverImageWithCtas() *MarketingHeroCoverImageWithCtas {
 	return &MarketingHeroCoverImageWithCtas{
-		_type:       "marketing_hero_cover_image_with_ctas",
+		Type:        "MarketingHeroCoverImageWithCtas",
 		Heading:     "Understand your Rails app in production",
 		Subheading:  "Stop guessing and understand what your Rails app is actually doing in production.",
 		HideFromNav: true,
