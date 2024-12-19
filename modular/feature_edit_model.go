@@ -34,15 +34,26 @@ func (m *FeatureEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	model, cmd := m.Form.Update(msg)
 	m.Form = model.(*huh.Form)
 
-	m.Parent.LandingPage.Write()
 	// If the form is completed
 	if m.Form.State == huh.StateCompleted {
+		// Update the block's features
+		if features := m.Block.GetFeatures(); len(features) > 0 {
+			for i := range features {
+				if &features[i] == m.Feature {
+					features[i] = *m.Feature
+					m.Block.SetFeatures(features)
+					break
+				}
+			}
+		}
+
 		m.Parent.LandingPage.Write()
 		m.NavigationCtx.Pop()
 		m.Parent.ModelStack.Pop()
 		return m.Parent.ModelStack.Current(), nil
 	}
 
+	m.Parent.LandingPage.Write()
 	return m, cmd
 }
 
