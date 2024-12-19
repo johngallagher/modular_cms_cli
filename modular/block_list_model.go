@@ -95,5 +95,10 @@ func (m *BlockListModel) View() string {
 
 // Init
 func (m *BlockListModel) Init() tea.Cmd {
+	items := []list.Item{}
+	for _, block := range m.Parent.LandingPage.Blocks {
+		items = append(items, block)
+	}
+	m.List.SetItems(items)
 	return nil
 }
