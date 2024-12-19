@@ -7,18 +7,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type FeatureItem struct {
+type FeatureListItem struct {
 	feature *Feature
 }
 
-func (i FeatureItem) Title() string       { return i.feature.Name }
-func (i FeatureItem) Description() string { return i.feature.Description }
-func (i FeatureItem) FilterValue() string { return i.feature.Name }
+func (i FeatureListItem) Title() string       { return i.feature.Heading }
+func (i FeatureListItem) Description() string { return i.feature.Summary }
+func (i FeatureListItem) FilterValue() string { return i.feature.Heading }
 
 func CreateFeatureListModelFromMainModel(m *MainModel, block BlockInterface, features []Feature) *FeatureListModel {
 	items := make([]list.Item, len(features))
 	for i := range features {
-		items[i] = FeatureItem{feature: &features[i]}
+		items[i] = FeatureListItem{feature: &features[i]}
 	}
 
 	l := list.New(items, list.NewDefaultDelegate(), 20, 14)
@@ -61,20 +61,20 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.Parent.ModelStack.Current(), nil
 		}
 		if msg.String() == "e" {
-			if i, ok := m.List.SelectedItem().(FeatureItem); ok {
+			if i, ok := m.List.SelectedItem().(FeatureListItem); ok {
 				m.List.ResetFilter()
 				m.NavigationCtx.Push("Edit Feature")
 				form := huh.NewForm(
 					huh.NewGroup(
 						huh.NewInput().
-							Key("name").
-							Title("Name").
-							Value(&i.feature.Name),
+							Key("heading").
+							Title("Heading").
+							Value(&i.feature.Heading),
 						huh.NewText().
-							Key("description").
-							Title("Description").
-							Value(&i.feature.Description),
-					).WithShowHelp(false),
+							Key("summary").
+							Title("Summary").
+							Value(&i.feature.Summary),
+					).WithShowHelp(false).WithHeight(m.Parent.height - 3).WithWidth(m.Parent.width),
 				)
 
 				featureEditModel := &FeatureEditModel{
@@ -90,27 +90,27 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if msg.String() == "a" {
 			newFeature := &Feature{
-				Name:        "New Feature",
-				Description: "New Feature Description",
+				Heading: "",
+				Summary: "",
 			}
 
 			*m.Features = append(*m.Features, *newFeature)
 			m.Block.SetFeatures(*m.Features)
 
-			featureItem := FeatureItem{feature: newFeature}
+			featureItem := FeatureListItem{feature: newFeature}
 			m.List.InsertItem(len(m.List.Items()), featureItem)
 
 			m.Parent.LandingPage.Write()
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewInput().
-						Key("name").
-						Title("Name").
-						Value(&newFeature.Name),
+						Key("heading").
+						Title("Heading").
+						Value(&newFeature.Heading),
 					huh.NewText().
-						Key("description").
-						Title("Description").
-						Value(&newFeature.Description),
+						Key("summary").
+						Title("Summary").
+						Value(&newFeature.Summary),
 				).WithShowHelp(false),
 			)
 

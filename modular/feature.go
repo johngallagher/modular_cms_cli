@@ -1,6 +1,7 @@
 package modular
 
 type Feature struct {
-	Name        string
-	Description string
+	Heading string `yaml:"heading"`
+	Summary string `yaml:"summary"`
+	Icon    string `yaml:"icon"`
 }

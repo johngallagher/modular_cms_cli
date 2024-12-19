@@ -46,16 +46,6 @@ func (m *BlockAddModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.String() == "enter" {
 			if i, ok := m.List.SelectedItem().(BlockInterface); ok {
 				m.Parent.LandingPage.Blocks = append(m.Parent.LandingPage.Blocks, i)
-
-				// Get the block list model and update its list
-				if blockList, ok := m.Parent.ModelStack.Current().(*BlockListModel); ok {
-					items := []list.Item{}
-					for _, block := range m.Parent.LandingPage.Blocks {
-						items = append(items, block)
-					}
-					blockList.List.SetItems(items)
-				}
-
 				m.Parent.LandingPage.Write()
 				m.Parent.NavigationCtx().Pop()
 				m.Parent.ModelStack.Pop()

@@ -5,7 +5,6 @@ import (
 	huh "github.com/charmbracelet/huh"
 )
 
-// FeatureEditModel for individual feature editing
 type FeatureEditModel struct {
 	Feature       *Feature
 	Form          *huh.Form
