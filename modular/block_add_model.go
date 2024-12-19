@@ -6,9 +6,11 @@ import (
 )
 
 type BlockAddModel struct {
-	Blocks []BlockInterface
-	List   list.Model
-	Parent *MainModel
+	Blocks        []BlockInterface
+	List          list.Model
+	Parent        *MainModel
+	BlockToAdd    BlockInterface
+	CurrentBlocks []BlockInterface
 }
 
 func BlockAddModelFromMainModel(m *MainModel) *BlockAddModel {
@@ -24,13 +26,18 @@ func BlockAddModelFromMainModel(m *MainModel) *BlockAddModel {
 	l.SetSize(m.Width(), m.Height()-3)
 
 	return &BlockAddModel{
-		Blocks: AllBlocks(),
-		List:   l,
-		Parent: m,
+		Blocks:        AllBlocks(),
+		List:          l,
+		Parent:        m,
+		BlockToAdd:    AllBlocks()[0],
+		CurrentBlocks: m.LandingPage.Blocks,
 	}
 }
 
 func (m *BlockAddModel) Init() tea.Cmd {
+	m.BlockToAdd = m.List.SelectedItem().(BlockInterface)
+	m.Parent.LandingPage.Blocks = append(m.CurrentBlocks, m.BlockToAdd)
+	m.Parent.LandingPage.Write()
 	return nil
 }
 
@@ -38,23 +45,25 @@ func (m *BlockAddModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "esc" {
+			m.Parent.LandingPage.Blocks = m.CurrentBlocks
+			m.Parent.LandingPage.Write()
 			m.Parent.NavigationCtx().Pop()
 			m.Parent.ModelStack.Pop()
 			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 
 		if msg.String() == "enter" {
-			if i, ok := m.List.SelectedItem().(BlockInterface); ok {
-				m.Parent.LandingPage.Blocks = append(m.Parent.LandingPage.Blocks, i)
-				m.Parent.LandingPage.Write()
-				m.Parent.NavigationCtx().Pop()
-				m.Parent.ModelStack.Pop()
-				return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
-			}
+			m.Parent.NavigationCtx().Pop()
+			m.Parent.ModelStack.Pop()
+			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 	}
 	var cmd tea.Cmd
 	m.List, cmd = m.List.Update(msg)
+	m.BlockToAdd = m.List.SelectedItem().(BlockInterface)
+	m.Parent.LandingPage.Blocks = append(m.CurrentBlocks, m.BlockToAdd)
+	m.Parent.LandingPage.Write()
+
 	return m, cmd
 }
 
