@@ -5,7 +5,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/charmbracelet/bubbletea"
+	"github.com/joyfulprogramming/modular_cms_cli/modular"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +23,13 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("edit called")
+		filePath, _ := cmd.Flags().GetString("file")
+
+		p := tea.NewProgram(modular.InitialModel(filePath))
+		if _, err := p.Run(); err != nil {
+			fmt.Printf("Error running program: %v", err)
+			os.Exit(1)
+		}
 	},
 }
 

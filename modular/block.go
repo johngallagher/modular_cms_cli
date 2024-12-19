@@ -1,4 +1,4 @@
-package main
+package modular
 
 // Model definition
 type Block struct {

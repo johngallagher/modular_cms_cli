@@ -1,11 +1,7 @@
-package main
+package modular
 
 import (
-	"fmt"
-	"os"
-
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spf13/cobra"
 )
 
 // Feature represents a detailed item within a block
@@ -23,22 +19,8 @@ type MainModel struct {
 	height        int
 }
 
-var (
-	filePath string
-	rootCmd  = &cobra.Command{
-		Use:   "yourapp",
-		Short: "Your application description",
-		Run: func(cmd *cobra.Command, args []string) {
-			if _, err := tea.NewProgram(initialModel(), tea.WithAltScreen()).Run(); err != nil {
-				fmt.Println("Error running program:", err)
-				os.Exit(1)
-			}
-		},
-	}
-)
-
 // Factory
-func initialModel() *MainModel {
+func InitialModel(filePath string) *MainModel {
 	navCtx := &NavigationContext{Path: []string{"Home"}}
 	landingPage := LandingPageFromMarkdownAtPath(filePath)
 
@@ -95,13 +77,4 @@ func (m *MainModel) View() string {
 		return "No active views"
 	}
 	return m.ModelStack.Current().View()
-}
-
-// Main function to run the application
-func main() {
-	rootCmd.PersistentFlags().StringVarP(&filePath, "file", "f", "index.md", "Path to the markdown file")
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }

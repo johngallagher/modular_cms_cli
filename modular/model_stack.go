@@ -1,4 +1,4 @@
-package main
+package modular
 
 import tea "github.com/charmbracelet/bubbletea"
 

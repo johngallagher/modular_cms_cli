@@ -1,4 +1,4 @@
-package main
+package modular
 
 // MarketingHeroCoverImageWithCtas represents a marketing hero block with CTAs
 type MarketingHeroCoverImageWithCtas struct {

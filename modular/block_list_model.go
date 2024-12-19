@@ -1,4 +1,4 @@
-package main
+package modular
 
 import (
 	"github.com/charmbracelet/bubbles/list"
