@@ -36,10 +36,11 @@ func (m *FeatureEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// If the form is completed
 	if m.Form.State == huh.StateCompleted {
+
 		// Update the block's features
 		if features := m.Block.GetFeatures(); len(features) > 0 {
 			for i := range features {
-				if &features[i] == m.Feature {
+				if features[i] == *m.Feature {
 					features[i] = *m.Feature
 					m.Block.SetFeatures(features)
 					break

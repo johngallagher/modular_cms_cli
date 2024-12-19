@@ -85,16 +85,16 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Parent:        m.Parent,
 				}
 				m.Parent.ModelStack.Push(featureEditModel)
-				return m.Parent.ModelStack.Current(), featureEditModel.Init()
+				return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 			}
 		}
 		if msg.String() == "a" {
-			newFeature := &Feature{
-				Heading: "",
-				Summary: "",
-			}
+			*m.Features = append(*m.Features, Feature{
+				Heading: "Heading",
+				Summary: "Summary",
+			})
+			newFeature := &(*m.Features)[len(*m.Features)-1]
 
-			*m.Features = append(*m.Features, *newFeature)
 			m.Block.SetFeatures(*m.Features)
 
 			featureItem := FeatureListItem{feature: newFeature}
@@ -123,7 +123,7 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Parent:        m.Parent,
 			}
 			m.Parent.ModelStack.Push(featureEditModel)
-			return featureEditModel, featureEditModel.Init()
+			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 		if msg.String() == "x" {
 			if i, ok := m.List.SelectedItem().(FeatureListItem); ok {
