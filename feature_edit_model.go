@@ -31,6 +31,7 @@ func (m *FeatureEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	var cmd tea.Cmd
+	m.Parent.LandingPage.Write()
 	model, cmd := m.Form.Update(msg)
 	m.Form = model.(*huh.Form)
 

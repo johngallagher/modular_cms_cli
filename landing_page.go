@@ -12,6 +12,7 @@ import (
 type LandingPage struct {
 	Blocks  []BlockInterface
 	Content string
+	Path    string
 }
 
 func NewLandingPage() *LandingPage {
@@ -33,10 +34,11 @@ func LandingPageFromMarkdownAtPath(path string) *LandingPage {
 	return &LandingPage{
 		Blocks:  blocks,
 		Content: content,
+		Path:    path,
 	}
 }
 
-func (lp LandingPage) WriteToFile(path string) error {
+func (lp LandingPage) Write() error {
 	frontmatter := map[string]interface{}{
 		"type":   "Page",
 		"layout": "page.webc",
@@ -51,7 +53,7 @@ func (lp LandingPage) WriteToFile(path string) error {
 	content := fmt.Sprintf("---\n%s---\n%s", yaml, lp.Content)
 
 	// Write to file
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(lp.Path, []byte(content), 0644); err != nil {
 		return fmt.Errorf("error writing file: %v", err)
 	}
 

@@ -2,7 +2,7 @@
 blocks:
     - type: MarketingHeroCoverImageWithCtas
       hide_from_nav: true
-      heading: Understand your Rails Legacy App
+      heading: Understand your Rails App
       subheading: Stop guessing and understand what your Rails app
       left:
         heading: 3 February 2025
