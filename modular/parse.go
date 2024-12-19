@@ -14,18 +14,18 @@ func Parse(blockData map[string]interface{}) (BlockInterface, error) {
 
 	var block BlockInterface
 	switch typeStr {
-	// case "FeatureSectionsCtaList":
-	// 	block = &FeatureSectionsCtaList{Type: typeStr}
+	case "FeatureSectionsCtaList":
+		block = &FeatureSectionsCtaList{Type: typeStr}
 	case "MarketingHeroCoverImageWithCtas":
 		block = &MarketingHeroCoverImageWithCtas{Type: typeStr}
-	// case "FeatureSectionsIcons":
-	// 	block = &FeatureSectionsIcons{Type: typeStr}
-	// case "FeatureSectionsCardList":
-	// 	block = &FeatureSectionsCardList{Type: typeStr}
-	// case "PricingTable":
-	// 	block = &PricingTable{Type: typeStr}
-	// case "FaqSectionsAccordion":
-	// 	block = &FaqSectionsAccordion{Type: typeStr}
+	case "FeatureSectionsIcons":
+		block = &FeatureSectionsIcons{Type: typeStr}
+	case "FeatureSectionsCardList":
+		block = &FeatureSectionsCardList{Type: typeStr}
+	case "PricingTable":
+		block = &PricingTable{Type: typeStr}
+	case "FaqSectionsAccordion":
+		block = &FaqSectionsAccordion{Type: typeStr}
 	// case "BlankBlock":
 	// 	block = &BlankBlock{Type: typeStr}
 	default:
