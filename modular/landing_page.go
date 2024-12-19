@@ -15,6 +15,10 @@ type LandingPage struct {
 	Path    string
 }
 
+func (lp *LandingPage) RemoveBlockAtIndex(index int) {
+	lp.Blocks = append(lp.Blocks[:index], lp.Blocks[index+1:]...)
+}
+
 func LandingPageFromMarkdownAtPath(path string) *LandingPage {
 	markdown, err := os.ReadFile(path)
 	if err != nil {

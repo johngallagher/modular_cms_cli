@@ -72,6 +72,23 @@ func (m *BlockListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.Parent.ModelStack.Push(BlockAddModelFromMainModel(m.Parent))
 			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
+		if msg.String() == "x" {
+			if i, ok := m.List.SelectedItem().(BlockInterface); ok {
+				// Find index of selected item in list
+				selectedIndex := -1
+				for j := range m.List.Items() {
+					if m.List.Items()[j] == i {
+						selectedIndex = j
+						break
+					}
+				}
+				if selectedIndex != -1 {
+					m.List.RemoveItem(selectedIndex)
+					m.Parent.LandingPage.RemoveBlockAtIndex(selectedIndex)
+					m.Parent.LandingPage.Write()
+				}
+			}
+		}
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height

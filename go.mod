@@ -32,6 +32,7 @@ require (
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/thoas/go-funk v0.9.3 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect

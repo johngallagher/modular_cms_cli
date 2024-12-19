@@ -3,6 +3,7 @@ package modular
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/thoas/go-funk"
 )
 
 type BlockAddModel struct {
@@ -14,9 +15,14 @@ type BlockAddModel struct {
 }
 
 func BlockAddModelFromMainModel(m *MainModel) *BlockAddModel {
+	existingIds := funk.Map(m.LandingPage.Blocks, func(b BlockInterface) string {
+		return b.ID()
+	})
 	items := []list.Item{}
 	for _, block := range AllBlocks() {
-		items = append(items, block)
+		if !funk.Contains(existingIds, block.ID()) {
+			items = append(items, block)
+		}
 	}
 
 	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
