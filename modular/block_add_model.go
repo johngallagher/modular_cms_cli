@@ -1,8 +1,6 @@
 package modular
 
 import (
-	"slices"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -14,12 +12,8 @@ type BlockAddModel struct {
 }
 
 func BlockAddModelFromMainModel(m *MainModel) *BlockAddModel {
-	alreadyUsedBlocks := m.LandingPage.Blocks
 	items := []list.Item{}
 	for _, block := range AllBlocks() {
-		if slices.Contains(alreadyUsedBlocks, block) {
-			continue
-		}
 		items = append(items, block)
 	}
 
@@ -41,7 +35,16 @@ func (m *BlockAddModel) Init() tea.Cmd {
 }
 
 func (m *BlockAddModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	_, cmd := m.List.Update(msg)
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.String() == "esc" {
+			m.Parent.NavigationCtx().Pop()
+			m.Parent.ModelStack.Pop()
+			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
+		}
+	}
+	var cmd tea.Cmd
+	m.List, cmd = m.List.Update(msg)
 	return m, cmd
 }
 
