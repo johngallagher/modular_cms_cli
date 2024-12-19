@@ -25,7 +25,7 @@ type MainModel struct {
 // Factory
 func initialModel() *MainModel {
 	navCtx := &NavigationContext{Path: []string{"Home"}}
-	landingPage := NewLandingPage()
+	landingPage := LandingPageFromMarkdownAtPath("index.md")
 
 	m := &MainModel{
 		NavigationCtx: navCtx,

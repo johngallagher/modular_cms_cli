@@ -18,6 +18,7 @@ blocks:
             url: https://joyfulprogramming.com
       image:
         url: https://images.unsplash.com/photo-1448932223592-d1fc686e76ea
+      features: []
 layout: page.webc
 type: Page
 ---
