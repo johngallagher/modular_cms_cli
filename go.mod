@@ -1,4 +1,4 @@
-module github.com/joyfulprogramming/modular_cms_cli
+module modular_cms_cli
 
 go 1.21
 

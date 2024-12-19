@@ -56,7 +56,7 @@ func parseBlock(blockData map[string]interface{}) (Block, error) {
 	return block, nil
 }
 
-func AllBlocks() []Block {
+func OldAllBlocks() []Block {
 	yamlData, err := os.ReadFile("all_blocks.yml")
 	if err != nil {
 		log.Fatal(err)

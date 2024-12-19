@@ -88,8 +88,8 @@ func (f *FeaturesShowField) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return f, huh.NextField
 		case msg.String() == "e":
 			return f, func() tea.Msg {
-				f.NavigationCtx.Push("Features")
-				f.Parent.ModelStack.Push(f.Parent.createFeatureListModel(f.Block, *f.FeaturesPointer))
+				f.Parent.NavigationCtx().Push("Features")
+				f.Parent.ModelStack.Push(CreateFeatureListModelFromMainModel(f.Parent, f.Block, *f.FeaturesPointer))
 				return f.Parent.ModelStack.Current().Init()
 			}
 		}

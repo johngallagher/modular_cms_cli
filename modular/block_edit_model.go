@@ -16,22 +16,22 @@ type BlockEditModel struct {
 }
 
 // Factory
-func (m *MainModel) createBlockEditModel(block BlockInterface) *BlockEditModel {
+func createBlockEditModelFromMainModel(m *MainModel, b BlockInterface) *BlockEditModel {
 	fields := make([]huh.Field, 0)
-	for _, def := range block.GetFieldDefinitions() {
-		fields = append(fields, def.CreateFormField(block, m))
+	for _, def := range b.GetFieldDefinitions() {
+		fields = append(fields, def.CreateFormField(b, m))
 	}
 
 	group := huh.NewGroup(fields...).WithShowHelp(true)
-	form := huh.NewForm(group).WithWidth(m.width).WithHeight(m.height - 3)
+	form := huh.NewForm(group).WithWidth(m.Width()).WithHeight(m.Height() - 3)
 
 	return &BlockEditModel{
-		Block:         block,
+		Block:         b,
 		Form:          form,
-		NavigationCtx: m.NavigationCtx,
+		NavigationCtx: m.NavigationCtx(),
 		Parent:        m,
-		width:         m.width,
-		height:        m.height,
+		width:         m.Width(),
+		height:        m.Height(),
 	}
 }
 

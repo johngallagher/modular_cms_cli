@@ -16,7 +16,7 @@ type BlockListModel struct {
 }
 
 // Factory
-func (m *MainModel) createBlockListModel() *BlockListModel {
+func CreateBlockListModelFromMainModel(m *MainModel) *BlockListModel {
 	items := []list.Item{}
 	for _, block := range m.LandingPage.Blocks {
 		items = append(items, block)
@@ -27,12 +27,12 @@ func (m *MainModel) createBlockListModel() *BlockListModel {
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 	l.Title = "Landing Page Blocks"
-	l.SetSize(m.width, m.height-3)
+	l.SetSize(m.Width(), m.Height()-3)
 
 	// Create model with stored dimensions
 	model := &BlockListModel{
 		List:          l,
-		NavigationCtx: m.NavigationCtx,
+		NavigationCtx: m.NavigationCtx(),
 		Parent:        m,
 	}
 
@@ -44,7 +44,7 @@ func (m *BlockListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "esc" {
-			m.NavigationCtx.Pop()
+			m.Parent.NavigationCtx().Pop()
 			m.Parent.ModelStack.Pop()
 			return m.Parent.ModelStack.Current(), nil
 		}
@@ -60,11 +60,17 @@ func (m *BlockListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				if selectedBlock != nil {
-					m.NavigationCtx.Push("Edit Block")
-					m.Parent.ModelStack.Push(m.Parent.createBlockEditModel(selectedBlock))
+					m.Parent.NavigationCtx().Push("Edit Block")
+					m.Parent.ModelStack.Push(createBlockEditModelFromMainModel(m.Parent, selectedBlock))
 					return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 				}
 			}
+		}
+
+		if msg.String() == "a" {
+			m.NavigationCtx.Push("Add Block")
+			m.Parent.ModelStack.Push(BlockAddModelFromMainModel(m.Parent))
+			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 	case tea.WindowSizeMsg:
 		m.width = msg.Width

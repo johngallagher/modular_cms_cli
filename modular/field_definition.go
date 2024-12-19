@@ -49,7 +49,7 @@ func (fd FieldDefinition) CreateFormField(block BlockInterface, m *MainModel) hu
 	case FieldTypeFeaturesShow:
 		return &FeaturesShowField{
 			Block:           block,
-			NavigationCtx:   m.NavigationCtx,
+			NavigationCtx:   m.NavigationCtx(),
 			Parent:          m,
 			FeaturesPointer: fd.FeaturesPointer,
 		}

@@ -8,13 +8,6 @@ type Block struct {
 	description string
 }
 
-// type FieldDefinition struct {
-// 	Key   string
-// 	Title string
-// 	Type  string
-// 	// Value func(block BlockInterface) *string
-// }
-
 type BlockInterface interface {
 	ID() string
 	Title() string
@@ -63,21 +56,8 @@ type NewFeature struct {
 	Icon    string `yaml:"icon"`
 }
 
-type FeatureSectionsCtaList struct {
-	Type        string       `yaml:"type"`
-	HideFromNav bool         `yaml:"hide_from_nav"`
-	Heading     string       `yaml:"heading"`
-	Subheading  string       `yaml:"subheading"`
-	Features    []NewFeature `yaml:"features"`
-	Library     string       `yaml:"library"`
-}
-
 type BlankBlock struct {
 	Type string `yaml:"type"`
-}
-
-func (f *FeatureSectionsCtaList) DisplayName() string {
-	return "Feature Sections Cta List"
 }
 
 type FeatureSectionsIcons struct {

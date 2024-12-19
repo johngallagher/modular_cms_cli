@@ -1,9 +1,9 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+Copyright © 2024 Joyful Programming <john@synapticmishap.co.uk>
 */
 package main
 
-import "github.com/joyfulprogramming/modular_cms_cli/cmd"
+import "modular_cms_cli/cmd"
 
 func main() {
 	cmd.Execute()

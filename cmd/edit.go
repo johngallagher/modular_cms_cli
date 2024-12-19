@@ -8,8 +8,8 @@ import (
 	"os"
 
 	"github.com/charmbracelet/bubbletea"
-	"github.com/joyfulprogramming/modular_cms_cli/modular"
 	"github.com/spf13/cobra"
+	"modular_cms_cli/modular"
 )
 
 // editCmd represents the edit command

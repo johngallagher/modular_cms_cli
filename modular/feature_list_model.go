@@ -15,7 +15,7 @@ func (i FeatureItem) Title() string       { return i.feature.Name }
 func (i FeatureItem) Description() string { return i.feature.Description }
 func (i FeatureItem) FilterValue() string { return i.feature.Name }
 
-func (m *MainModel) createFeatureListModel(block BlockInterface, features []Feature) *FeatureListModel {
+func CreateFeatureListModelFromMainModel(m *MainModel, block BlockInterface, features []Feature) *FeatureListModel {
 	items := make([]list.Item, len(features))
 	for i := range features {
 		items[i] = FeatureItem{feature: &features[i]}
@@ -26,12 +26,12 @@ func (m *MainModel) createFeatureListModel(block BlockInterface, features []Feat
 	l.SetShowStatusBar(true)
 	l.SetFilteringEnabled(true)
 	l.SetShowHelp(true)
-	l.SetSize(m.width, m.height-3)
+	l.SetSize(m.Width(), m.Height()-3)
 
 	return &FeatureListModel{
 		Block:         block,
 		List:          l,
-		NavigationCtx: m.NavigationCtx,
+		NavigationCtx: m.NavigationCtx(),
 		Parent:        m,
 		Features:      &features,
 	}

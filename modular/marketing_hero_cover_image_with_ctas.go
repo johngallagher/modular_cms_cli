@@ -64,36 +64,3 @@ func (b *MarketingHeroCoverImageWithCtas) GetFieldDefinitions() []*FieldDefiniti
 		{Key: "Image.URL", Title: "Image URL", Type: FieldTypeInput, ValuePointer: &b.Image.URL},
 	}
 }
-
-// NewMarketingHeroCoverImageWithCtas creates a new marketing hero block with default values
-func NewMarketingHeroCoverImageWithCtas() *MarketingHeroCoverImageWithCtas {
-	return &MarketingHeroCoverImageWithCtas{
-		Type:        "MarketingHeroCoverImageWithCtas",
-		Heading:     "Understand your Rails app in production",
-		Subheading:  "Stop guessing and understand what your Rails app is actually doing in production.",
-		HideFromNav: true,
-		Image: Image{
-			URL: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-		},
-		Left: Side{
-			Heading:    "3 February 2025",
-			Subheading: "6 Weeks Workshop. Hands On And Practical. No DevOps Experience Needed. Less Than 4 Hours A Week. Designed For Seniors And Leads. Solo Or Team Workshops.",
-			CTA: CTA{
-				Text: "Book Now",
-				URL:  "https://www.google.com",
-			},
-		},
-		Right: Side{
-			Heading:    "Understand your Rails app in production",
-			Subheading: "Stop guessing and understand what your Rails app is actually doing in production.",
-			CTA: CTA{
-				Text: "Book Now",
-				URL:  "https://www.google.com",
-			},
-		},
-		Features: []Feature{
-			{Name: "Feature 1", Description: "Description 1"},
-			{Name: "Feature 2", Description: "Description 2"},
-		},
-	}
-}
