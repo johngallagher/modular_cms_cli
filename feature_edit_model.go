@@ -26,6 +26,7 @@ func (m *FeatureEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc":
 			m.NavigationCtx.Pop()
 			m.Parent.ModelStack.Pop()
+			m.Parent.LandingPage.Write()
 			return m.Parent.ModelStack.Current(), nil
 		}
 	}
@@ -39,6 +40,7 @@ func (m *FeatureEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.Form.State == huh.StateCompleted {
 		m.NavigationCtx.Pop()
 		m.Parent.ModelStack.Pop()
+		m.Parent.LandingPage.Write()
 		return m.Parent.ModelStack.Current(), nil
 	}
 

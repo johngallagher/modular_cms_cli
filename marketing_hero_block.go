@@ -40,6 +40,10 @@ func (b MarketingHeroCoverImageWithCtas) GetFeatures() []Feature {
 	return b.Features
 }
 
+func (b *MarketingHeroCoverImageWithCtas) SetFeatures(features []Feature) {
+	b.Features = features
+}
+
 func (b MarketingHeroCoverImageWithCtas) ID() string {
 	return "marketing_hero_cover_image_with_ctas"
 }

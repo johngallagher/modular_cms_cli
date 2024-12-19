@@ -87,6 +87,43 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return featureEditModel, featureEditModel.Init()
 			}
 		}
+		if msg.String() == "a" {
+			newFeature := &Feature{
+				Name:        "New Feature",
+				Description: "New Feature Description",
+			}
+
+			*m.Features = append(*m.Features, *newFeature)
+			m.Block.SetFeatures(*m.Features)
+
+			featureItem := FeatureItem{feature: newFeature}
+			m.List.InsertItem(len(m.List.Items()), featureItem)
+
+			form := huh.NewForm(
+				huh.NewGroup(
+					huh.NewInput().
+						Key("name").
+						Title("Name").
+						Value(&newFeature.Name),
+					huh.NewText().
+						Key("description").
+						Title("Description").
+						Value(&newFeature.Description),
+				).WithShowHelp(false),
+			)
+
+			m.NavigationCtx.Push("New Feature")
+			featureEditModel := &FeatureEditModel{
+				Feature:       newFeature,
+				Block:         m.Block,
+				Form:          form,
+				NavigationCtx: m.NavigationCtx,
+				Parent:        m.Parent,
+			}
+			m.Parent.ModelStack.Push(featureEditModel)
+			return featureEditModel, featureEditModel.Init()
+		}
+
 	case tea.WindowSizeMsg:
 		h, v := lipgloss.NewStyle().Margin(2, 2).GetFrameSize()
 		m.List.SetSize(msg.Width-h, msg.Height-v)

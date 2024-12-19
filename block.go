@@ -22,6 +22,7 @@ type BlockInterface interface {
 	DescriptionPointer() *string
 	GetFieldDefinitions() []*FieldDefinition
 	GetFeatures() []Feature
+	SetFeatures([]Feature)
 	FilterValue() string
 }
 

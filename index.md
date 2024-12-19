@@ -2,8 +2,8 @@
 blocks:
     - type: MarketingHeroCoverImageWithCtas
       hide_from_nav: true
-      heading: Understand your Rails App
-      subheading: Stop guessing and understand what your Rails app
+      heading: Understand your App
+      subheading: Stop guessing and understand what on earth your Rails app is **actually doing**.
       left:
         heading: 3 February 2025
         subheading: 6 Weeks Workshop. Hands On And Practical. No DevOps Experience Needed. Less Than 4 Hours A Week. Designed For Seniors And Leads. Solo Or Team Workshops.
@@ -18,7 +18,15 @@ blocks:
             url: https://joyfulprogramming.com
       image:
         url: https://images.unsplash.com/photo-1448932223592-d1fc686e76ea
-      features: []
+      features:
+        - name: New Feature
+          description: New Feature Description
+        - name: New Feature
+          description: New Feature Description
 layout: page.webc
 type: Page
 ---
+
+# Content
+
+Some content
