@@ -37,9 +37,9 @@ func (m *FeatureEditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.Parent.LandingPage.Write()
 	// If the form is completed
 	if m.Form.State == huh.StateCompleted {
+		m.Parent.LandingPage.Write()
 		m.NavigationCtx.Pop()
 		m.Parent.ModelStack.Pop()
-		m.Parent.LandingPage.Write()
 		return m.Parent.ModelStack.Current(), nil
 	}
 

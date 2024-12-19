@@ -85,7 +85,7 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Parent:        m.Parent,
 				}
 				m.Parent.ModelStack.Push(featureEditModel)
-				return featureEditModel, featureEditModel.Init()
+				return m.Parent.ModelStack.Current(), featureEditModel.Init()
 			}
 		}
 		if msg.String() == "a" {
@@ -124,6 +124,24 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.Parent.ModelStack.Push(featureEditModel)
 			return featureEditModel, featureEditModel.Init()
+		}
+		if msg.String() == "x" {
+			if i, ok := m.List.SelectedItem().(FeatureListItem); ok {
+				selectedIndex := -1
+				for j := range m.List.Items() {
+					if m.List.Items()[j] == i {
+						selectedIndex = j
+						break
+					}
+				}
+
+				if selectedIndex != -1 {
+					*m.Features = append((*m.Features)[:selectedIndex], (*m.Features)[selectedIndex+1:]...)
+					m.Block.SetFeatures(*m.Features)
+					m.List.RemoveItem(selectedIndex)
+					m.Parent.LandingPage.Write()
+				}
+			}
 		}
 
 	case tea.WindowSizeMsg:
