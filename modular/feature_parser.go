@@ -38,6 +38,9 @@ func ParseFeatures(input string) []Feature {
 			skipNext = false
 		}
 	}
+	for i := range features {
+		features[i].Summary = strings.TrimSpace(features[i].Summary)
+	}
 
 	return features
 }
