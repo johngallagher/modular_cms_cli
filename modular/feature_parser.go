@@ -13,7 +13,7 @@ import (
 // Feature Name 2
 // Description for feature 2
 func ParseFeatures(input string) []Feature {
-	var features []Feature
+	features := []Feature{}
 	var currentFeature Feature
 
 	scanner := bufio.NewScanner(strings.NewReader(input))
