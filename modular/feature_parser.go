@@ -1,49 +1,42 @@
 package modular
 
 import (
-	"bufio"
 	"strings"
 )
 
-// ParseFeatures converts a string containing feature definitions into []Feature
-// Format expected:
-// Feature Name 1
-// Description for feature 1
-//
-// Feature Name 2
-// Description for feature 2
 func ParseFeatures(input string) []Feature {
-	features := []Feature{}
-	var currentFeature Feature
+	input = strings.TrimSpace(input)
+	lines := strings.Split(input, "\n")
+	var features []Feature
 
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	isName := true // alternates between name and description
-
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-
-		// Empty line marks the end of a feature
-		if line == "" {
-			if currentFeature.Heading != "" {
-				features = append(features, currentFeature)
-				currentFeature = Feature{}
-			}
-			isName = true
+	var nextLine string
+	var skipNext bool
+	skipNext = false
+	for i, line := range lines {
+		if i == len(lines)-1 {
+			nextLine = ""
+		} else {
+			nextLine = lines[i+1]
+		}
+		if skipNext {
+			skipNext = false
+			continue
+		}
+		if i == 0 {
+			// First line is always a heading
+			features = append(features, Feature{Heading: line, Summary: nextLine})
+			skipNext = true
 			continue
 		}
 
-		if isName {
-			currentFeature.Heading = line
-			isName = false
+		if line != "" && nextLine != "" {
+			features = append(features, Feature{Heading: line, Summary: nextLine})
+			skipNext = true
 		} else {
-			currentFeature.Summary = line
-			isName = true
+			lastFeature := &features[len(features)-1]
+			lastFeature.Summary += "\n" + line
+			skipNext = false
 		}
-	}
-
-	// Add the last feature if exists
-	if currentFeature.Heading != "" {
-		features = append(features, currentFeature)
 	}
 
 	return features
