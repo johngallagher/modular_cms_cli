@@ -143,6 +143,11 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
+		if msg.String() == "i" {
+			m.NavigationCtx.Push("Import Features")
+			m.Parent.ModelStack.Push(CreateFeatureImportModelFromMainModel(m.Parent, m.Block, *m.Features, &m.List))
+			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
+		}
 
 	case tea.WindowSizeMsg:
 		h, v := lipgloss.NewStyle().Margin(2, 2).GetFrameSize()
