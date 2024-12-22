@@ -23,7 +23,9 @@ func CreateFeatureImportModelFromMainModel(m *MainModel, b BlockInterface, featu
 		Key("text").
 		Title("Enter features (one per line)").
 		CharLimit(1000000).
-		Value(&input)
+		Value(&input).
+		WithWidth(m.Width()).
+		WithHeight(m.Height() - 3)
 
 	form := huh.NewForm(
 		huh.NewGroup(textInput).WithShowHelp(false),
