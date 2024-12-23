@@ -64,7 +64,7 @@ func (m *FeatureImportModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.Parent.NavigationCtx().Pop()
 		m.Parent.ModelStack.Pop()
-		return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
+		return m.Parent.ModelStack.Current(), nil
 	}
 
 	return m, cmd
