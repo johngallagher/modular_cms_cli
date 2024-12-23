@@ -126,8 +126,9 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 		if msg.String() == "x" {
-
 			selectedIndex := m.List.Index()
+			// panic(fmt.Sprintf("Selected index: %d, Features length: %d", selectedIndex, len(*m.Features)))
+
 			if selectedIndex >= 0 && selectedIndex < len(*m.Features) {
 				// Create new slice without selected item
 				newFeatures := make([]Feature, 0, len(*m.Features)-1)
@@ -143,7 +144,7 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if msg.String() == "i" {
 			m.NavigationCtx.Push("Import Features")
-			m.Parent.ModelStack.Push(CreateFeatureImportModelFromMainModel(m.Parent, m.Block, *m.Features, &m.List))
+			m.Parent.ModelStack.Push(CreateFeatureImportModelFromMainModel(m.Parent, m.Block, m.Features, &m.List))
 			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 

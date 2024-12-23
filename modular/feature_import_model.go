@@ -13,11 +13,11 @@ type FeatureImportModel struct {
 	Parent   *MainModel
 	width    int
 	height   int
-	Features []Feature
+	Features *[]Feature
 	List     *list.Model
 }
 
-func CreateFeatureImportModelFromMainModel(m *MainModel, b BlockInterface, features []Feature, list *list.Model) *FeatureImportModel {
+func CreateFeatureImportModelFromMainModel(m *MainModel, b BlockInterface, features *[]Feature, list *list.Model) *FeatureImportModel {
 	input := ""
 	textInput := huh.NewText().
 		Key("text").
@@ -51,15 +51,19 @@ func (m *FeatureImportModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.Form = model.(*huh.Form)
 
 	if m.Form.State == huh.StateCompleted {
+
 		input := m.Form.GetString("text")
 		features := ParseFeatures(input)
-		m.Features = append(m.Features, features...)
-		m.Block.SetFeatures(m.Features)
-		items := make([]list.Item, len(m.Features))
-		for i := range m.Features {
-			items[i] = FeatureListItem{feature: &m.Features[i]}
+		*m.Features = append(*m.Features, features...)
+		m.Block.SetFeatures(*m.Features)
+		items := make([]list.Item, len(*m.Features))
+		for i := range *m.Features {
+			items[i] = FeatureListItem{feature: &(*m.Features)[i]}
 		}
 		m.List.SetItems(items)
+		// Update the list's internal state after setting items
+		m.List.ResetSelected()
+		m.List.ResetFilter()
 		m.Parent.LandingPage.Write()
 
 		m.Parent.NavigationCtx().Pop()
