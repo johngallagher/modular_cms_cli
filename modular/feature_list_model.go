@@ -126,21 +126,19 @@ func (m *FeatureListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.Parent.ModelStack.Current(), m.Parent.ModelStack.Current().Init()
 		}
 		if msg.String() == "x" {
-			if i, ok := m.List.SelectedItem().(FeatureListItem); ok {
-				selectedIndex := -1
-				for j := range m.List.Items() {
-					if m.List.Items()[j] == i {
-						selectedIndex = j
-						break
-					}
-				}
 
-				if selectedIndex != -1 {
-					*m.Features = append((*m.Features)[:selectedIndex], (*m.Features)[selectedIndex+1:]...)
-					m.Block.SetFeatures(*m.Features)
-					m.List.RemoveItem(selectedIndex)
-					m.Parent.LandingPage.Write()
-				}
+			selectedIndex := m.List.Index()
+			if selectedIndex >= 0 && selectedIndex < len(*m.Features) {
+				// Create new slice without selected item
+				newFeatures := make([]Feature, 0, len(*m.Features)-1)
+				newFeatures = append(newFeatures, (*m.Features)[:selectedIndex]...)
+				newFeatures = append(newFeatures, (*m.Features)[selectedIndex+1:]...)
+				*m.Features = newFeatures
+
+				// Update block and list
+				m.Block.SetFeatures(*m.Features)
+				m.List.RemoveItem(selectedIndex)
+				m.Parent.LandingPage.Write()
 			}
 		}
 		if msg.String() == "i" {
