@@ -24,13 +24,13 @@ func ParseFeatures(input string) []Feature {
 		}
 		if i == 0 {
 			// First line is always a heading
-			features = append(features, Feature{Heading: line, Summary: nextLine})
+			features = append(features, Feature{Heading: line, Summary: nextLine, Icon: ""})
 			skipNext = true
 			continue
 		}
 
 		if line != "" && nextLine != "" {
-			features = append(features, Feature{Heading: line, Summary: nextLine})
+			features = append(features, Feature{Heading: line, Summary: nextLine, Icon: ""})
 			skipNext = true
 		} else {
 			lastFeature := &features[len(features)-1]

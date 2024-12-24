@@ -22,7 +22,7 @@ func (f FaqSectionsAccordion) FilterValue() string {
 }
 
 func (f FaqSectionsAccordion) Title() string {
-	return f.Heading
+	return "[" + f.DisplayName() + "] " + f.Heading
 }
 
 func (f *FaqSectionsAccordion) TitlePointer() *string {

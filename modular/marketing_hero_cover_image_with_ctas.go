@@ -13,7 +13,7 @@ type MarketingHeroCoverImageWithCtas struct {
 }
 
 func (b MarketingHeroCoverImageWithCtas) DisplayName() string {
-	return "Marketing Hero Cover Image With Ctas"
+	return "Marketing Hero Cover Image With CTAs"
 }
 
 func (b MarketingHeroCoverImageWithCtas) FilterValue() string {
@@ -21,7 +21,7 @@ func (b MarketingHeroCoverImageWithCtas) FilterValue() string {
 }
 
 func (b MarketingHeroCoverImageWithCtas) Title() string {
-	return b.Heading
+	return "[" + b.DisplayName() + "] " + b.Heading
 }
 
 func (b *MarketingHeroCoverImageWithCtas) TitlePointer() *string {

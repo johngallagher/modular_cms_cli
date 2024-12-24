@@ -22,7 +22,7 @@ func (p PricingTable) FilterValue() string {
 }
 
 func (p PricingTable) Title() string {
-	return p.Heading
+	return "[" + p.DisplayName() + "] " + p.Heading
 }
 
 func (p *PricingTable) TitlePointer() *string {

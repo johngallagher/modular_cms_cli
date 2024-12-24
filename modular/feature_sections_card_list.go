@@ -15,7 +15,7 @@ func (f FeatureSectionsCardList) FilterValue() string {
 }
 
 func (f FeatureSectionsCardList) Title() string {
-	return f.Heading
+	return "[" + f.DisplayName() + "] " + f.Heading
 }
 
 func (f *FeatureSectionsCardList) TitlePointer() *string {

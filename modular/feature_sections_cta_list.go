@@ -18,7 +18,7 @@ func (b FeatureSectionsCtaList) FilterValue() string {
 }
 
 func (b FeatureSectionsCtaList) Title() string {
-	return b.Heading
+	return "[" + b.DisplayName() + "] " + b.Heading
 }
 
 func (b *FeatureSectionsCtaList) TitlePointer() *string {

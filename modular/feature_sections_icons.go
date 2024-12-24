@@ -15,7 +15,7 @@ func (f FeatureSectionsIcons) FilterValue() string {
 }
 
 func (f FeatureSectionsIcons) Title() string {
-	return f.Heading
+	return "[" + f.DisplayName() + "] " + f.Heading
 }
 
 func (f *FeatureSectionsIcons) TitlePointer() *string {
