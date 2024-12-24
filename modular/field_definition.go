@@ -46,6 +46,11 @@ func (fd FieldDefinition) CreateFormField(block BlockInterface, m *MainModel) hu
 			Key(fd.Key).
 			Title(fd.Title).
 			Value(fd.ValuePointer)
+	case FieldTypeTextArea:
+		return huh.NewText().
+			Key(fd.Key).
+			Title(fd.Title).
+			Value(fd.ValuePointer)
 	case FieldTypeFeaturesShow:
 		return &FeaturesShowField{
 			Block:           block,
