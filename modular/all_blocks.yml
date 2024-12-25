@@ -125,3 +125,8 @@
         Learn more about these technologies:
         - Flowbite Pro
         - Tailwind UI
+- type: ContactDefaultForm
+  library: FlowBite
+  heading: Contact us
+  subheading: >-
+    We are a team of developers and designers who are passionate about creating beautiful and functional websites.
