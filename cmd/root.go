@@ -11,7 +11,7 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "modular",
+	Use:   "modular_cli",
 	Short: "CLI tool to build static sites with components in seconds",
 	Long:  "Convention over configuration for static sites. GUI landing page builders are clumsy, slow, bug ridden and annoying to use for engineers. Static site builders are better, but setting one up requires hours of research and fiddling with hundreds of options. Modular is a CLI driven CMS that allows you to build fast, beautiful landing pages with your favorite component system in seconds.",
 	// Run: func(cmd *cobra.Command, args []string) {
