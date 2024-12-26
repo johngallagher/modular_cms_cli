@@ -1,13 +1,13 @@
 import { defineStackbitConfig } from '@stackbit/types';
 import { GitContentSource } from '@stackbit/cms-git';
-import { Page } from './src/_models/page';
-import { MarketingHeroCoverImageWithCtas } from './src/_models/MarketingHeroCoverImageWithCtas';
-import { FeatureSectionsCtaList } from './src/_models/FeatureSectionsCtaList';
-import { FeatureSectionsIcons } from './src/_models/FeatureSectionsIcons';
-import { FeatureSectionsCardList } from './src/_models/FeatureSectionsCardList';
-import { PricingTable } from './src/_models/PricingTable';
-import { FaqSectionsAccordion } from './src/_models/FaqSectionsAccordion';
-import { ContactDefaultForm } from './src/_models/ContactDefaultForm';
+import { Page } from './src/models/page';
+import { MarketingHeroCoverImageWithCtas } from './src/models/MarketingHeroCoverImageWithCtas';
+import { FeatureSectionsCtaList } from './src/models/FeatureSectionsCtaList';
+import { FeatureSectionsIcons } from './src/models/FeatureSectionsIcons';
+import { FeatureSectionsCardList } from './src/models/FeatureSectionsCardList';
+import { PricingTable } from './src/models/PricingTable';
+import { FaqSectionsAccordion } from './src/models/FaqSectionsAccordion';
+import { ContactDefaultForm } from './src/models/ContactDefaultForm';
 
 export default defineStackbitConfig({
     stackbitVersion: '~0.7.0',

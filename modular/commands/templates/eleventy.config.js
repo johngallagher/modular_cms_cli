@@ -22,11 +22,11 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/images/favicon": "/" });
   eleventyConfig.ignores.add("./README.md");
   eleventyConfig.addWatchTarget(
-    "src/_components/**/*.css",
-    "src/_models/**/*.ts",
+    "src/components/**/*.css",
+    "src/models/**/*.ts",
   );
   eleventyConfig.addPlugin(pluginWebc, {
-    components: ["src/_components/**/*.webc"],
+    components: ["src/components/**/*.webc"],
   });
   eleventyConfig.addPlugin(IdAttributePlugin);
   eleventyConfig.setServerOptions({
@@ -61,6 +61,9 @@ export default function (eleventyConfig) {
     dir: {
       input: 'src',
       output: '_site',
+      includes: "includes",
+      layouts: "layouts",
+      data: "data",
     },
   };
 };
