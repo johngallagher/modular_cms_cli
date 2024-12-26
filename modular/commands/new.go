@@ -4,6 +4,8 @@ import (
 	"embed"
 	"fmt"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,28 +67,45 @@ func New(cmd *cobra.Command, args []string) {
 				return fmt.Errorf("error creating directories: %v", err)
 			}
 
-			// Create output file
+			// Create output file without .tmpl extension if present
+			outPath = strings.TrimSuffix(outPath, ".tmpl")
 			outFile, err := os.Create(outPath)
 			if err != nil {
 				return fmt.Errorf("error creating file %s: %v", outPath, err)
 			}
 			defer outFile.Close()
 
-			if strings.HasSuffix(path, ".tmpl") {
+			if strings.HasSuffix(entry.Name(), ".tmpl") {
 				// Parse and execute template
 				tmpl, err := template.New(entry.Name()).Parse(string(content))
 				if err != nil {
 					return fmt.Errorf("error parsing template %s: %v", path, err)
 				}
 
+				// Convert first argument to title case and humanize for site name
+
+				siteName := filepath.Base(absPath)
+				siteName = strings.ReplaceAll(siteName, "_", " ")
+				siteName = cases.Title(language.English).String(siteName)
+
 				type Site struct {
-					Name string
+					Name        string
+					Product     string
+					Company     string
+					Description string
 				}
 
 				type Locals struct {
 					Site Site
 				}
-				locals := Locals{Site: Site{Name: "My Site"}}
+				locals := Locals{
+					Site: Site{
+						Name:        siteName,
+						Product:     "My Product",
+						Company:     "My Company",
+						Description: "My Description",
+					},
+				}
 				// Execute template
 				if err := tmpl.Execute(outFile, locals); err != nil {
 					return fmt.Errorf("error executing template %s: %v", path, err)
