@@ -76,9 +76,6 @@ tags
 
 # End of https://www.toptal.com/developers/gitignore/api/go,osx,vim
 
-.env
-_site
-
 ### Node ###
 # Logs
 logs
@@ -218,3 +215,6 @@ dist
 
 # SvelteKit build / generate output
 .svelte-kit
+
+.env
+_site

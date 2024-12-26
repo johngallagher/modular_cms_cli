@@ -8,6 +8,7 @@ import { FeatureSectionsCardList } from './src/models/FeatureSectionsCardList';
 import { PricingTable } from './src/models/PricingTable';
 import { FaqSectionsAccordion } from './src/models/FaqSectionsAccordion';
 import { ContactDefaultForm } from './src/models/ContactDefaultForm';
+import { FeatureBlock } from './src/models/blocks/FeatureBlock';
 
 export default defineStackbitConfig({
     stackbitVersion: '~0.7.0',
@@ -30,9 +31,7 @@ export default defineStackbitConfig({
             models: [
                 Page,
                 MarketingHeroCoverImageWithCtas,
-                FeatureSectionsCtaList,
-                FeatureSectionsIcons,
-                FeatureSectionsCardList,
+                FeatureBlock,
                 PricingTable,
                 FaqSectionsAccordion,
                 ContactDefaultForm

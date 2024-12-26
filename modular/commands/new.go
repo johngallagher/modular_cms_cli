@@ -3,13 +3,15 @@ package commands
 import (
 	"embed"
 	"fmt"
-	"github.com/spf13/cobra"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/spf13/cobra"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 //go:embed templates/*
@@ -124,10 +126,65 @@ func New(cmd *cobra.Command, args []string) {
 		return nil
 	}
 
-	if err := walkDir("templates"); err != nil {
-		fmt.Printf("Error processing templates: %v\n", err)
+	// Create public directory with .gitkeep file
+	publicDir := filepath.Join(absPath, "public")
+	if err := os.MkdirAll(publicDir, 0755); err != nil {
+		fmt.Printf("Error creating public directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	gitkeepPath := filepath.Join(publicDir, ".gitkeep")
+	if err := os.WriteFile(gitkeepPath, []byte{}, 0644); err != nil {
+		fmt.Printf("Error creating .gitkeep file: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Printf("Created new Modular site at %s\n", absPath)
+
+	// Change directory to the new site
+	if err := os.Chdir(absPath); err != nil {
+		fmt.Printf("Error changing directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Install dependencies
+	if err := runCommand("yarn", "install"); err != nil {
+		fmt.Printf("Error installing dependencies: %v\n", err)
+		os.Exit(1)
+	}
+
+	// chmod +x bin/serve bin/build
+	if err := runCommand("chmod", "+x", "bin/serve", "bin/build"); err != nil {
+		fmt.Printf("Error setting permissions: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Create new git repo
+	if err := runCommand("git", "init"); err != nil {
+		fmt.Printf("Error initializing git repo: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Add .env file
+	if err := os.WriteFile(".env", []byte(""), 0644); err != nil {
+		fmt.Printf("Error creating .env file: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Git commit
+	if err := runCommand("git", "add", "-A"); err != nil {
+		fmt.Printf("Error adding files to git: %v\n", err)
+		os.Exit(1)
+	}
+	if err := runCommand("git", "commit", "-m", "Initial commit"); err != nil {
+		fmt.Printf("Error committing files to git: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func runCommand(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
