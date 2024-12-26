@@ -3,13 +3,13 @@ package commands
 import (
 	"embed"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
 
-	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -17,9 +17,7 @@ import (
 //go:embed templates/*
 var templateFiles embed.FS
 
-func New(cmd *cobra.Command, args []string) {
-	path := args[0]
-
+func CreateNewSite(path string) {
 	// Convert relative path to absolute
 	absPath, err := filepath.Abs(path)
 	if err != nil {
@@ -33,158 +31,132 @@ func New(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	// Recursively walk through all embedded files
-	var walkDir func(string) error
-	walkDir = func(dir string) error {
-		entries, err := templateFiles.ReadDir(dir)
+	fs.WalkDir(templateFiles, "templates", func(filePath string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return fmt.Errorf("error reading directory %s: %v", dir, err)
+			fmt.Printf("Error walking template files: %v\n", err)
+			os.Exit(1)
 		}
 
-		for _, entry := range entries {
-			path := filepath.Join(dir, entry.Name())
+		relPath := strings.TrimPrefix(filePath, "templates/")
+		destPath := filepath.Join(absPath, relPath)
 
-			if entry.IsDir() {
-				if err := walkDir(path); err != nil {
-					return err
-				}
-				continue
+		if d.IsDir() {
+			// Create directory
+			if err := os.MkdirAll(destPath, 0755); err != nil {
+				fmt.Printf("Error creating directory: %v\n", err)
+				os.Exit(1)
 			}
+			return nil
+		}
 
-			// Read template content
-			content, err := templateFiles.ReadFile(path)
-			if err != nil {
-				return fmt.Errorf("error reading file %s: %v", path, err)
+		content, err := templateFiles.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf("Error reading template file: %v\n", err)
+			os.Exit(1)
+		}
+
+		if strings.HasSuffix(relPath, ".tmpl") {
+			if err := executeTemplate(filePath, absPath, destPath); err != nil {
+				fmt.Printf("Error executing template: %v\n", err)
+				os.Exit(1)
 			}
-
-			// Create output file path relative to absPath
-			relPath, err := filepath.Rel("templates", path)
-			if err != nil {
-				return fmt.Errorf("error getting relative path: %v", err)
-			}
-			outPath := filepath.Join(absPath, relPath)
-
-			// Create directory structure
-			if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
-				return fmt.Errorf("error creating directories: %v", err)
-			}
-
-			// Create output file without .tmpl extension if present
-			outPath = strings.TrimSuffix(outPath, ".tmpl")
-			outFile, err := os.Create(outPath)
-			if err != nil {
-				return fmt.Errorf("error creating file %s: %v", outPath, err)
-			}
-			defer outFile.Close()
-
-			if strings.HasSuffix(entry.Name(), ".tmpl") {
-				// Parse and execute template
-				tmpl, err := template.New(entry.Name()).Parse(string(content))
-				if err != nil {
-					return fmt.Errorf("error parsing template %s: %v", path, err)
-				}
-
-				// Convert first argument to title case and humanize for site name
-
-				siteName := filepath.Base(absPath)
-				siteName = strings.ReplaceAll(siteName, "_", " ")
-				siteName = cases.Title(language.English).String(siteName)
-
-				type Site struct {
-					Name        string
-					Product     string
-					Company     string
-					Description string
-				}
-
-				type Locals struct {
-					Site Site
-				}
-				locals := Locals{
-					Site: Site{
-						Name:        siteName,
-						Product:     "My Product",
-						Company:     "My Company",
-						Description: "My Description",
-					},
-				}
-				// Execute template
-				if err := tmpl.Execute(outFile, locals); err != nil {
-					return fmt.Errorf("error executing template %s: %v", path, err)
-				}
-			} else {
-				// Copy file
-				content, err := templateFiles.ReadFile(path)
-				if err != nil {
-					return fmt.Errorf("error reading file %s: %v", path, err)
-				}
-				if err := os.WriteFile(outPath, content, 0644); err != nil {
-					return fmt.Errorf("error writing file %s: %v", outPath, err)
-				}
+		} else {
+			// Copy file
+			if err := os.WriteFile(destPath, content, 0644); err != nil {
+				fmt.Printf("Error writing file: %v\n", err)
+				os.Exit(1)
 			}
 		}
+
 		return nil
-	}
+	})
 
-	// Create public directory with .gitkeep file
-	publicDir := filepath.Join(absPath, "public")
-	if err := os.MkdirAll(publicDir, 0755); err != nil {
-		fmt.Printf("Error creating public directory: %v\n", err)
-		os.Exit(1)
-	}
-
-	gitkeepPath := filepath.Join(publicDir, ".gitkeep")
-	if err := os.WriteFile(gitkeepPath, []byte{}, 0644); err != nil {
-		fmt.Printf("Error creating .gitkeep file: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("Created new Modular site at %s\n", absPath)
-
-	// Change directory to the new site
+	// Change to the new directory
 	if err := os.Chdir(absPath); err != nil {
 		fmt.Printf("Error changing directory: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Install dependencies
-	if err := runCommand("yarn", "install"); err != nil {
-		fmt.Printf("Error installing dependencies: %v\n", err)
-		os.Exit(1)
-	}
+	createPublicDir(absPath)
+	runCommand("yarn", "install")
+	runCommand("chmod", "+x", "bin/serve", "bin/build")
+	runCommand("touch", ".env")
+	runCommand("git", "init")
+	runCommand("git", "add", "-A")
+	runCommand("git", "commit", "-m", "Initial commit")
+	fmt.Printf("Created new Modular site at %s\n", absPath)
+	fmt.Println("\nNext Steps:")
+	fmt.Printf(" 1. cd %s\n", absPath)
+	fmt.Println(" 2. bin/serve")
+}
 
-	// chmod +x bin/serve bin/build
-	if err := runCommand("chmod", "+x", "bin/serve", "bin/build"); err != nil {
-		fmt.Printf("Error setting permissions: %v\n", err)
+func createPublicDir(path string) {
+	publicDir := filepath.Join(path, "public")
+	if err := os.MkdirAll(publicDir, 0755); err != nil {
+		fmt.Printf("error creating public directory: %v", err)
 		os.Exit(1)
 	}
-
-	// Create new git repo
-	if err := runCommand("git", "init"); err != nil {
-		fmt.Printf("Error initializing git repo: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Add .env file
-	if err := os.WriteFile(".env", []byte(""), 0644); err != nil {
-		fmt.Printf("Error creating .env file: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Git commit
-	if err := runCommand("git", "add", "-A"); err != nil {
-		fmt.Printf("Error adding files to git: %v\n", err)
-		os.Exit(1)
-	}
-	if err := runCommand("git", "commit", "-m", "Initial commit"); err != nil {
-		fmt.Printf("Error committing files to git: %v\n", err)
+	if err := os.WriteFile(filepath.Join(publicDir, ".gitkeep"), []byte{}, 0644); err != nil {
+		fmt.Printf("error creating .gitkeep file: %v", err)
 		os.Exit(1)
 	}
 }
 
-func runCommand(name string, args ...string) error {
+func executeTemplate(path string, absPath string, destPath string) error {
+	content, err := templateFiles.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("error reading file %s: %v", path, err)
+	}
+	// Parse and execute template
+	tmpl, err := template.New(path).Parse(string(content))
+	if err != nil {
+		return fmt.Errorf("error parsing template %s: %v", path, err)
+	}
+
+	// Convert path to title case and humanize for site name
+	siteName := filepath.Base(absPath)
+	siteName = strings.ReplaceAll(siteName, "_", " ")
+	siteName = cases.Title(language.English).String(siteName)
+
+	type Site struct {
+		Name        string
+		Product     string
+		Company     string
+		Description string
+	}
+
+	type Locals struct {
+		Site Site
+	}
+	locals := Locals{
+		Site: Site{
+			Name:        siteName,
+			Product:     "My Product",
+			Company:     "My Company",
+			Description: "My Description",
+		},
+	}
+
+	destPath = strings.TrimSuffix(destPath, ".tmpl")
+	file, err := os.Create(destPath)
+	if err != nil {
+		return fmt.Errorf("error creating file %s: %v", destPath, err)
+	}
+	defer file.Close()
+
+	// Execute template
+	if err := tmpl.Execute(file, locals); err != nil {
+		return fmt.Errorf("error executing template %s: %v", path, err)
+	}
+	return nil
+}
+
+func runCommand(name string, args ...string) {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error running command %s: %v\n", name, err)
+		os.Exit(1)
+	}
 }
