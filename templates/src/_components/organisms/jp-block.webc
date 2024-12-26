@@ -1,0 +1,7 @@
+<script webc:type="js">
+  const kebabCase = (str) => str.replace(/ /g, '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  const namespace = (str) => str.match(/[A-Z]/g).join('').toLowerCase();
+  const library = webc.attributes.block.library || 'FlowBite';
+  const local = webc.attributes.block.local || 'object';
+  `<x webc:is="${namespace(library)}-${kebabCase(webc.attributes.block.type)}" :${local}="webc.attributes.block"></x>`
+</script>

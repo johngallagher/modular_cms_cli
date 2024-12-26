@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" :content="description || site.description">
+
+	<title @text="title || site.title"></title>
+
+	<link rel="preload" href="/fonts/inter-v18-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+	<style webc:keep>
+		/* inter-300 - latin */
+		@font-face {
+			font-display: swap;
+			/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 300;
+			src: url('/fonts/inter-v18-latin-300.woff2') format('woff2');
+			/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+		}
+
+		/* inter-regular - latin */
+		@font-face {
+			font-display: swap;
+			/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 400;
+			src: url('/fonts/inter-v18-latin-regular.woff2') format('woff2');
+			/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+		}
+
+		/* inter-500 - latin */
+		@font-face {
+			font-display: swap;
+			/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 500;
+			src: url('/fonts/inter-v18-latin-500.woff2') format('woff2');
+			/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+		}
+
+		/* inter-600 - latin */
+		@font-face {
+			font-display: swap;
+			/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 600;
+			src: url('/fonts/inter-v18-latin-600.woff2') format('woff2');
+			/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+		}
+
+		/* inter-700 - latin */
+		@font-face {
+			font-display: swap;
+			/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 700;
+			src: url('/fonts/inter-v18-latin-700.woff2') format('woff2');
+			/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+		}
+
+		/* inter-800 - latin */
+		@font-face {
+			font-display: swap;
+			/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 800;
+			src: url('/fonts/inter-v18-latin-800.woff2') format('woff2');
+			/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+		}
+	</style>
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:site" content="@">
+	<meta name="twitter:creator" content="@">
+	<meta name="twitter:title" :content="title || site.title">
+	<meta name="twitter:description" :content="description || site.description">
+	<link rel="stylesheet" href="styles.css" webc:keep>
+	<style webc:keep @raw="getBundle('css')"></style>
+	<script webc:keep @raw="getBundle('js')"></script>
+</head>
+
+<body>
+	<header>
+		<fb-nav :company="site.company" :product="site.product" :blocks="blocks"></fb-nav>
+	</header>
+	<main id="skip" @raw="content">
+	</main>
+	<fb-pre-footer-with-cta :company="site.company" :product="site.product"></fb-pre-footer-with-cta>
+	<script webc:type="js">`<!-- Build timestamp: ${Date.now()} -->`</script>
+</body>
+
+</html>

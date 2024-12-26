@@ -1,0 +1,71 @@
+[
+  {
+    "id": "prod_QstmUTmH3KaaEV",
+    "price": 2000,
+    "features": [],
+    "cta": {
+      "text": "Get started",
+      "url": "https://buy.stripe.com/bIYeVP5hK22X7Yc007"
+    },
+    "product_line": {
+      "id": "",
+      "name": ""
+    }
+  },
+  {
+    "id": "prod_QoTFxmHghfUeRo",
+    "name": "Materials Only",
+    "subheading": "Download just course materials.",
+    "price": 75,
+    "features": [],
+    "cta": {
+      "text": "Get started",
+      "url": "https://buy.stripe.com/14k2935hK8rl1zObIN"
+    },
+    "product_line": {
+      "id": "observability_workshop_1",
+      "name": "Fix Bugs 20x Faster Workshop"
+    }
+  },
+  {
+    "id": "prod_QYHXbnVYbPh22l",
+    "name": "Team",
+    "subheading": "Create a culture within your team.",
+    "price": 2000,
+    "features": [
+      "Weekly Live Group Sessions",
+      "Personalised Action Plan For Your Company",
+      "Full Workshop Recordings",
+      "Slack Channel Access",
+      "Priority Email Support"
+    ],
+    "cta": {
+      "text": "Get started",
+      "url": "https://buy.stripe.com/dR6eVPeSk22X7YceUY"
+    },
+    "product_line": {
+      "id": "observability_workshop_1",
+      "name": "Fix Bugs 20x Faster Workshop"
+    }
+  },
+  {
+    "id": "prod_QUuRyxMMrbdtU8",
+    "name": "Solo",
+    "subheading": "Designed for solo engineers.",
+    "price": 150,
+    "features": [
+      "6 Weekly Live Group Sessions",
+      "Personalised Action Plan",
+      "Slack Channel Access",
+      "Basic Email Support"
+    ],
+    "cta": {
+      "text": "Get started",
+      "url": "https://buy.stripe.com/3cs4hb6lO3712DS7su"
+    },
+    "product_line": {
+      "id": "observability_workshop_1",
+      "name": "Fix Bugs 20x Faster Workshop"
+    }
+  }
+]

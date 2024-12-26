@@ -1,0 +1,3 @@
+<script webc:type="js">
+  this.log(this.logo)
+</script>

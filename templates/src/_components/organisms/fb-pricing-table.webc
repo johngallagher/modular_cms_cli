@@ -1,0 +1,5 @@
+<script webc:type="js">
+  const plans = read('plans').filter(plan => plan.product_line.id === webc.attributes.object.product_line_id).sort(priceDescending);
+  webc.attributes.object.plans = plans;
+  `<fb-pricing-cards :object="object"></fb-pricing-cards>`
+</script>

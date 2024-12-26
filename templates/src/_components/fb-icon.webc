@@ -1,0 +1,8 @@
+  <script webc:type="js">
+    if (!this.name) {
+      ``;
+    } else {
+      const classWithDefaults = this.class || 'mx-auto mb-4 w-12 h-12 text-primary-600 dark:text-primary-500';
+      `<x class="${classWithDefaults}" webc:is="fb-icon-${name}.svg" webc:import="icons"></x>`
+    }
+  </script>

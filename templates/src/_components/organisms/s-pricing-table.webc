@@ -1,0 +1,2 @@
+<script async src="https://js.stripe.com/v3/pricing-table.js" webc:keep></script>
+<stripe-pricing-table :pricing-table-id="object.id" publishable-key="pk_live_Qj5tlokSNA0Lbk4wE6bd0yan" webc:keep></stripe-pricing-table>
