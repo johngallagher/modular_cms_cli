@@ -4,8 +4,18 @@ Copyright © 2024 Joyful Programming
 package cmd
 
 import (
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+
+	"strings"
+	"text/template"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/spf13/cobra"
-	"modular_cms_cli/modular/commands"
 )
 
 // newCmd represents the new command
@@ -15,10 +25,145 @@ var newCmd = &cobra.Command{
 	Long:  "Create a new Modular site at the specified path",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		commands.New(cmd, args)
+		path := args[0]
+
+		// Convert relative path to absolute
+		absPath, err := filepath.Abs(path)
+		if err != nil {
+			fmt.Printf("Error resolving path: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Create the directory if it doesn't exist
+		if err := os.MkdirAll(absPath, 0755); err != nil {
+			fmt.Printf("Error creating directory: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Copy template files
+		if err := filepath.Walk("modular/commands/templates", func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			// Calculate destination path
+			relPath, err := filepath.Rel("modular/commands/templates", path)
+			if err != nil {
+				return fmt.Errorf("error getting relative path: %v", err)
+			}
+			destPath := filepath.Join(absPath, relPath)
+
+			if info.IsDir() {
+				// Create directory
+				return os.MkdirAll(destPath, 0755)
+			}
+
+			if strings.HasSuffix(path, ".tmpl") {
+				return executeTemplate(path, absPath, destPath, info)
+			} else {
+				// Copy file
+				input, err := os.ReadFile(path)
+				if err != nil {
+					return fmt.Errorf("error reading file %s: %v", path, err)
+				}
+				return os.WriteFile(destPath, input, 0644)
+			}
+		}); err != nil {
+			fmt.Printf("Error copying template files: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Change to the new directory
+		if err := os.Chdir(absPath); err != nil {
+			fmt.Printf("Error changing directory: %v\n", err)
+			os.Exit(1)
+		}
+
+		createPublicDir(absPath)
+		runCommand("yarn", "install")
+		runCommand("chmod", "+x", "bin/serve", "bin/build")
+		runCommand("touch", ".env")
+		runCommand("git", "init")
+		runCommand("git", "add", "-A")
+		runCommand("git", "commit", "-m", "Initial commit")
+		fmt.Printf("Created new Modular site at %s\n", absPath)
+		fmt.Println("\nNext Steps:")
+		fmt.Printf(" 1. cd %s\n", absPath)
+		fmt.Println(" 2. bin/serve")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(newCmd)
+}
+
+func createPublicDir(absPath string) {
+	publicDir := filepath.Join(absPath, "public")
+	if err := os.MkdirAll(publicDir, 0755); err != nil {
+		fmt.Printf("error creating public directory: %v", err)
+		os.Exit(1)
+	}
+	if err := os.WriteFile(filepath.Join(publicDir, ".gitkeep"), []byte{}, 0644); err != nil {
+		fmt.Printf("error creating .gitkeep file: %v", err)
+		os.Exit(1)
+	}
+}
+
+func executeTemplate(path string, absPath string, destPath string, entry os.FileInfo) error {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("error reading file %s: %v", path, err)
+	}
+	// Parse and execute template
+	tmpl, err := template.New(entry.Name()).Parse(string(content))
+	if err != nil {
+		return fmt.Errorf("error parsing template %s: %v", path, err)
+	}
+
+	// Convert path to title case and humanize for site name
+	siteName := filepath.Base(absPath)
+	siteName = strings.ReplaceAll(siteName, "_", " ")
+	siteName = cases.Title(language.English).String(siteName)
+
+	type Site struct {
+		Name        string
+		Product     string
+		Company     string
+		Description string
+	}
+
+	type Locals struct {
+		Site Site
+	}
+	locals := Locals{
+		Site: Site{
+			Name:        siteName,
+			Product:     "My Product",
+			Company:     "My Company",
+			Description: "My Description",
+		},
+	}
+
+	destPath = strings.TrimSuffix(destPath, ".tmpl")
+	file, err := os.Create(destPath)
+	if err != nil {
+		return fmt.Errorf("error creating file %s: %v", destPath, err)
+	}
+	defer file.Close()
+
+	// Execute template
+	if err := tmpl.Execute(file, locals); err != nil {
+		return fmt.Errorf("error executing template %s: %v", path, err)
+	}
+	return nil
+}
+
+func runCommand(name string, args ...string) {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error running command %s: %v\n", name, err)
+		os.Exit(1)
+	}
 }
