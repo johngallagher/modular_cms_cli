@@ -1,16 +1,11 @@
 package modular
 
 type PricingTable struct {
-	Type       string    `yaml:"type"`
-	Library    string    `yaml:"library"`
-	Heading    string    `yaml:"heading"`
-	Subheading string    `yaml:"subheading"`
-	Products   []Product `yaml:"products"`
-}
-
-type Product struct {
-	ID            string `yaml:"id"`
-	PaymentLinkID string `yaml:"payment_link_id"`
+	Type          string `yaml:"type"`
+	Library       string `yaml:"library"`
+	Heading       string `yaml:"heading"`
+	Subheading    string `yaml:"subheading"`
+	ProductLineID string `yaml:"product_line_id"`
 }
 
 func (p *PricingTable) DisplayName() string {
@@ -48,6 +43,7 @@ func (p *PricingTable) GetFieldDefinitions() []*FieldDefinition {
 	return []*FieldDefinition{
 		{Key: "Heading", Title: "Heading", Type: FieldTypeInput, ValuePointer: &p.Heading},
 		{Key: "Subheading", Title: "Subheading", Type: FieldTypeInput, ValuePointer: &p.Subheading},
+		{Key: "ProductLineID", Title: "Product Line ID", Type: FieldTypeInput, ValuePointer: &p.ProductLineID},
 	}
 }
 
