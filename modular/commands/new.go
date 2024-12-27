@@ -86,8 +86,9 @@ func CreateNewSite(path string) {
 	runCommand("git", "commit", "-m", "Initial commit")
 	fmt.Printf("Created new Modular site at %s\n", absPath)
 	fmt.Println("\nNext Steps:")
-	fmt.Printf(" 1. cd %s\n", absPath)
-	fmt.Println(" 2. bin/serve")
+	fmt.Printf(" cd %s\n", absPath)
+	fmt.Println(" bin/serve             # serve the site")
+	fmt.Println(" modular_cli page edit # edit the index.md file")
 }
 
 func createPublicDir(path string) {
