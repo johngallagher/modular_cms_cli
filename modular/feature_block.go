@@ -43,7 +43,7 @@ func (b *FeatureBlock) SetFeatures(features []Feature) {
 }
 
 func (b FeatureBlock) ID() string {
-	return "feature_section"
+	return "feature_section_" + b.View
 }
 
 func (b *FeatureBlock) GetFieldDefinitions() []*FieldDefinition {
