@@ -218,3 +218,4 @@ dist
 
 .env
 _site
+.stackbit/

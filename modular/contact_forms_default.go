@@ -1,6 +1,6 @@
 package modular
 
-type ContactDefaultForm struct {
+type ContactFormsDefault struct {
 	Type        string `yaml:"type"`
 	HideFromNav bool   `yaml:"hide_from_nav"`
 	Library     string `yaml:"library"`
@@ -9,38 +9,38 @@ type ContactDefaultForm struct {
 	SubmitText  string `yaml:"submit_text"`
 }
 
-func (f *ContactDefaultForm) DisplayName() string {
+func (f *ContactFormsDefault) DisplayName() string {
 	return "Contact Default Form"
 }
 
-func (f ContactDefaultForm) FilterValue() string {
+func (f ContactFormsDefault) FilterValue() string {
 	return f.Heading
 }
 
-func (f ContactDefaultForm) Title() string {
+func (f ContactFormsDefault) Title() string {
 	return "[" + f.DisplayName() + "] " + f.Heading
 }
 
-func (f *ContactDefaultForm) TitlePointer() *string {
+func (f *ContactFormsDefault) TitlePointer() *string {
 	return &f.Heading
 }
 
-func (f ContactDefaultForm) Description() string {
+func (f ContactFormsDefault) Description() string {
 	return f.Subheading
 }
 
-func (f *ContactDefaultForm) DescriptionPointer() *string {
+func (f *ContactFormsDefault) DescriptionPointer() *string {
 	return &f.Subheading
 }
 
-func (f ContactDefaultForm) GetFeatures() []Feature {
+func (f ContactFormsDefault) GetFeatures() []Feature {
 	return []Feature{}
 }
 
-func (f *ContactDefaultForm) SetFeatures(features []Feature) {
+func (f *ContactFormsDefault) SetFeatures(features []Feature) {
 }
 
-func (f *ContactDefaultForm) GetFieldDefinitions() []*FieldDefinition {
+func (f *ContactFormsDefault) GetFieldDefinitions() []*FieldDefinition {
 	return []*FieldDefinition{
 		{Key: "Heading", Title: "Heading", Type: FieldTypeInput, ValuePointer: &f.Heading},
 		{Key: "Subheading", Title: "Subheading", Type: FieldTypeInput, ValuePointer: &f.Subheading},
@@ -48,6 +48,6 @@ func (f *ContactDefaultForm) GetFieldDefinitions() []*FieldDefinition {
 	}
 }
 
-func (f *ContactDefaultForm) ID() string {
+func (f *ContactFormsDefault) ID() string {
 	return "contact_default_form"
 }

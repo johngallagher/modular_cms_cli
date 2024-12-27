@@ -4,7 +4,7 @@
   if (webc.attributes.block.view) {
     const library = webc.attributes.block.library || 'FlowBite';
     const local = webc.attributes.block.local || 'object';
-    `<x webc:is="${namespace(library)}-${kebabCase(webc.attributes.block.type)}-${webc.attributes.block.view}" :${local}="webc.attributes.block"></x>`
+    `<x webc:is="${namespace(library)}-${kebabCase(webc.attributes.block.type)}s-${webc.attributes.block.view}" :${local}="webc.attributes.block"></x>`
   } else {
     const library = webc.attributes.block.library || 'FlowBite';
     const local = webc.attributes.block.local || 'object';

@@ -1,14 +1,27 @@
 import { Model } from '@stackbit/types';
 
-export const FeatureSectionsCtaList: Model = {
+export const FeatureSection: Model = {
   type: 'object',
-  name: 'FeatureSectionsCtaList',
+  name: 'FeatureSection',
   fields: [
     {
       type: 'boolean',
       name: 'hide_from_nav',
       label: 'Hide From Navigation',
-      default: true
+      default: true,
+      required: true
+    },
+    {
+      type: 'enum',
+      name: 'view',
+      label: 'View',
+      default: 'card-list',
+      required: true,
+      options: [
+        { value: 'cta-list', label: 'CTA List' },
+        { value: 'card-list', label: 'Card List' },
+        { value: 'icons', label: 'Icons' }
+      ]
     },
     {
       type: 'string',
@@ -43,13 +56,17 @@ export const FeatureSectionsCtaList: Model = {
             required: true
           },
           {
-            type: 'string',
+            type: 'enum',
             name: 'icon',
             label: 'Icon',
-            required: true
+            required: false,
+            options: [
+              { value: 'solid-bed', label: 'Bed' },
+            ]
           }
         ]
       }
     }
   ]
 };
+

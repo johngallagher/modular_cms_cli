@@ -2,13 +2,10 @@ import { defineStackbitConfig } from '@stackbit/types';
 import { GitContentSource } from '@stackbit/cms-git';
 import { Page } from './src/models/page';
 import { MarketingHeroCoverImageWithCtas } from './src/models/MarketingHeroCoverImageWithCtas';
-import { FeatureSectionsCtaList } from './src/models/FeatureSectionsCtaList';
-import { FeatureSectionsIcons } from './src/models/FeatureSectionsIcons';
-import { FeatureSectionsCardList } from './src/models/FeatureSectionsCardList';
 import { PricingTable } from './src/models/PricingTable';
 import { FaqSectionsAccordion } from './src/models/FaqSectionsAccordion';
-import { ContactDefaultForm } from './src/models/ContactDefaultForm';
-import { FeatureBlock } from './src/models/blocks/FeatureBlock';
+import { ContactFormsDefault } from './src/models/ContactFormsDefault';
+import { FeatureSection } from './src/models/FeatureSection';
 
 export default defineStackbitConfig({
     stackbitVersion: '~0.7.0',
@@ -31,10 +28,10 @@ export default defineStackbitConfig({
             models: [
                 Page,
                 MarketingHeroCoverImageWithCtas,
-                FeatureBlock,
+                FeatureSection,
                 PricingTable,
                 FaqSectionsAccordion,
-                ContactDefaultForm
+                ContactFormsDefault
             ],
             assetsConfig: {
                 referenceType: 'static',

@@ -27,8 +27,8 @@ func AllBlocks() []BlockInterface {
 				URL: "https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/conference-speaker.jpg",
 			},
 		},
-		&FeatureBlock{
-			Type:        "FeatureBlock",
+		&FeatureSection{
+			Type:        "FeatureSection",
 			Library:     "FlowBite",
 			View:        "cta-list",
 			Heading:     "The most trusted cryptocurrency platform",
@@ -52,8 +52,8 @@ func AllBlocks() []BlockInterface {
 				},
 			},
 		},
-		&FeatureBlock{
-			Type:        "FeatureBlock",
+		&FeatureSection{
+			Type:        "FeatureSection",
 			Library:     "FlowBite",
 			Heading:     "Designed for business teams like yours",
 			HideFromNav: false,
@@ -72,8 +72,8 @@ func AllBlocks() []BlockInterface {
 				},
 			},
 		},
-		&FeatureBlock{
-			Type:        "FeatureBlock",
+		&FeatureSection{
+			Type:        "FeatureSection",
 			Library:     "FlowBite",
 			HideFromNav: false,
 			Heading:     "Secure platform, secure data",
@@ -114,8 +114,8 @@ func AllBlocks() []BlockInterface {
 			Subheading:    "Flexible pricing for all teams and budgets.",
 			ProductLineID: "observability_workshop_1",
 		},
-		&ContactDefaultForm{
-			Type:        "ContactDefaultForm",
+		&ContactFormsDefault{
+			Type:        "ContactFormsDefault",
 			HideFromNav: false,
 			Library:     "FlowBite",
 			Heading:     "Contact us",

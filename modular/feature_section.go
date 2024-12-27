@@ -1,6 +1,6 @@
 package modular
 
-type FeatureBlock struct {
+type FeatureSection struct {
 	Type        string    `yaml:"type"`
 	HideFromNav bool      `yaml:"hide_from_nav"`
 	Heading     string    `yaml:"heading"`
@@ -10,43 +10,43 @@ type FeatureBlock struct {
 	View        string    `yaml:"view"`
 }
 
-func (b FeatureBlock) DisplayName() string {
+func (b FeatureSection) DisplayName() string {
 	return "Feature"
 }
 
-func (b FeatureBlock) FilterValue() string {
+func (b FeatureSection) FilterValue() string {
 	return b.Heading
 }
 
-func (b FeatureBlock) Title() string {
+func (b FeatureSection) Title() string {
 	return "[" + b.DisplayName() + "] [" + b.View + "] " + b.Heading
 }
 
-func (b *FeatureBlock) TitlePointer() *string {
+func (b *FeatureSection) TitlePointer() *string {
 	return &b.Heading
 }
 
-func (b FeatureBlock) Description() string {
+func (b FeatureSection) Description() string {
 	return b.Subheading
 }
 
-func (b *FeatureBlock) DescriptionPointer() *string {
+func (b *FeatureSection) DescriptionPointer() *string {
 	return &b.Subheading
 }
 
-func (b FeatureBlock) GetFeatures() []Feature {
+func (b FeatureSection) GetFeatures() []Feature {
 	return b.Features
 }
 
-func (b *FeatureBlock) SetFeatures(features []Feature) {
+func (b *FeatureSection) SetFeatures(features []Feature) {
 	b.Features = features
 }
 
-func (b FeatureBlock) ID() string {
+func (b FeatureSection) ID() string {
 	return "feature_section_" + b.View
 }
 
-func (b *FeatureBlock) GetFieldDefinitions() []*FieldDefinition {
+func (b *FeatureSection) GetFieldDefinitions() []*FieldDefinition {
 	return []*FieldDefinition{
 		{Key: "Heading", Title: "Heading", Type: FieldTypeInput, ValuePointer: &b.Heading},
 		{Key: "Subheading", Title: "Subheading", Type: FieldTypeInput, ValuePointer: &b.Subheading},

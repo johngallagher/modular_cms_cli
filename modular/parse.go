@@ -26,10 +26,10 @@ func Parse(blockData map[string]interface{}) (BlockInterface, error) {
 		block = &PricingTable{Type: typeStr}
 	case "FaqSectionsAccordion":
 		block = &FaqSectionsAccordion{Type: typeStr}
-	case "ContactDefaultForm":
-		block = &ContactDefaultForm{Type: typeStr}
-	case "FeatureBlock":
-		block = &FeatureBlock{Type: typeStr}
+	case "ContactFormsDefault":
+		block = &ContactFormsDefault{Type: typeStr}
+	case "FeatureSection":
+		block = &FeatureSection{Type: typeStr}
 	default:
 		return nil, fmt.Errorf("unknown block type: %s", typeStr)
 	}

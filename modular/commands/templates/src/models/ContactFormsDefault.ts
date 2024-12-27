@@ -1,8 +1,8 @@
 import { Model } from '@stackbit/types';
 
-export const ContactDefaultForm: Model = {
+export const ContactFormsDefault: Model = {
   type: 'object',
-  name: 'ContactDefaultForm',
+  name: 'ContactFormsDefault',
   fields: [
     { name: 'heading', label: 'Heading', type: 'text' },
     { name: 'subheading', label: 'Subheading', type: 'text' },
