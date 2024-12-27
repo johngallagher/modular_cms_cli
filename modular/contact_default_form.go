@@ -1,11 +1,12 @@
 package modular
 
 type ContactDefaultForm struct {
-	Type       string `yaml:"type"`
-	Library    string `yaml:"library"`
-	Heading    string `yaml:"heading"`
-	Subheading string `yaml:"subheading"`
-	SubmitText string `yaml:"submit_text"`
+	Type        string `yaml:"type"`
+	HideFromNav bool   `yaml:"hide_from_nav"`
+	Library     string `yaml:"library"`
+	Heading     string `yaml:"heading"`
+	Subheading  string `yaml:"subheading"`
+	SubmitText  string `yaml:"submit_text"`
 }
 
 func (f *ContactDefaultForm) DisplayName() string {

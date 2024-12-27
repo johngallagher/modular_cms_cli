@@ -32,7 +32,7 @@ func AllBlocks() []BlockInterface {
 			Library:     "FlowBite",
 			View:        "cta-list",
 			Heading:     "The most trusted cryptocurrency platform",
-			HideFromNav: true,
+			HideFromNav: false,
 			Subheading:  "Here are a few reasons why you should choose Flowbite",
 			Features: []Feature{
 				{
@@ -56,7 +56,7 @@ func AllBlocks() []BlockInterface {
 			Type:        "FeatureBlock",
 			Library:     "FlowBite",
 			Heading:     "Designed for business teams like yours",
-			HideFromNav: true,
+			HideFromNav: false,
 			Subheading:  "Here are a few reasons why you should choose Flowbite",
 			View:        "icons",
 			Features: []Feature{
@@ -75,7 +75,7 @@ func AllBlocks() []BlockInterface {
 		&FeatureBlock{
 			Type:        "FeatureBlock",
 			Library:     "FlowBite",
-			HideFromNav: true,
+			HideFromNav: false,
 			Heading:     "Secure platform, secure data",
 			Subheading:  "Here are a few reasons why you should choose Flowbite",
 			View:        "card-list",
@@ -108,16 +108,18 @@ func AllBlocks() []BlockInterface {
 		},
 		&PricingTable{
 			Type:          "PricingTable",
+			HideFromNav:   false,
 			Library:       "FlowBite",
 			Heading:       "Pricing Plans",
 			Subheading:    "Flexible pricing for all teams and budgets.",
 			ProductLineID: "observability_workshop_1",
 		},
 		&ContactDefaultForm{
-			Type:       "ContactDefaultForm",
-			Library:    "FlowBite",
-			Heading:    "Contact us",
-			Subheading: "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+			Type:        "ContactDefaultForm",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Contact us",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
 		},
 	}
 }

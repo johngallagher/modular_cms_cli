@@ -2,6 +2,7 @@ package modular
 
 type PricingTable struct {
 	Type          string `yaml:"type"`
+	HideFromNav   bool   `yaml:"hide_from_nav"`
 	Library       string `yaml:"library"`
 	Heading       string `yaml:"heading"`
 	Subheading    string `yaml:"subheading"`
