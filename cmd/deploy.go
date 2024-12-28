@@ -1,202 +1,27 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/go-github/v60/github"
-	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"runtime"
 	"strconv"
+
+	"path/filepath"
+	"strings"
 	"time"
+
+	"runtime"
+
+	"github.com/google/go-github/v68/github"
+	"github.com/spf13/cobra"
 )
 
-var provider string
-
-var deployCmd = &cobra.Command{
-	Use:   "deploy",
-	Short: "Deploy your site to a hosting provider",
-	Long:  "Deploy your site to a hosting provider (currently supports Netlify)",
-	Run: func(cmd *cobra.Command, args []string) {
-		if provider != "netlify" {
-			fmt.Println("Error: Only Netlify provider is currently supported")
-			os.Exit(1)
-		}
-
-		// Get current directory name for site name
-		currentDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("Error getting current directory: %v\n", err)
-			os.Exit(1)
-		}
-		siteName := filepath.Base(currentDir)
-
-		ghToken, err := getGitHubToken()
-		if err != nil {
-			fmt.Printf("Error authenticating with GitHub: %v\n", err)
-			os.Exit(1)
-		}
-
-		// Get Netlify token from environment
-		netlifyToken := os.Getenv("NETLIFY_AUTH_TOKEN")
-		if netlifyToken == "" {
-			fmt.Println("Please set NETLIFY_AUTH_TOKEN environment variable")
-			fmt.Println("You can create one at https://app.netlify.com/user/applications")
-			os.Exit(1)
-		}
-
-		ctx := context.Background()
-
-		// Initialize GitHub client
-		ts := oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: ghToken},
-		)
-		tc := oauth2.NewClient(ctx, ts)
-		ghClient := github.NewClient(tc)
-
-		// Create GitHub repository if it doesn't exist
-		repo, err := createGitHubRepo(ctx, ghClient, siteName)
-		if err != nil {
-			fmt.Printf("Error creating GitHub repository: %v\n", err)
-			os.Exit(1)
-		}
-
-		// Deploy to Netlify
-		fmt.Println("Deploying to Netlify...")
-		siteURL, err := createNetlifySite(netlifyToken, *repo.HTMLURL, siteName)
-		if err != nil {
-			fmt.Printf("Error deploying to Netlify: %v\n", err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("🎉 Deployment complete! Your site will be available at: %s\n", siteURL)
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(deployCmd)
-	deployCmd.Flags().StringVarP(&provider, "provider", "p", "netlify", "Hosting provider (only netlify supported)")
-}
-
-func createGitHubRepo(ctx context.Context, client *github.Client, name string) (*github.Repository, error) {
-	// Check if repo exists
-	repo, _, err := client.Repositories.Get(ctx, "", name)
-	if err == nil {
-		return repo, nil
-	}
-
-	// Create new repo
-	repo, _, err = client.Repositories.Create(ctx, "", &github.Repository{
-		Name:        github.String(name),
-		Private:     github.Bool(false),
-		Description: github.String("Created with modular_cli"),
-		AutoInit:    github.Bool(true),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create repository: %v", err)
-	}
-
-	return repo, nil
-}
-
-func createNetlifySite(token, repoURL, siteName string) (string, error) {
-	type createSiteRequest struct {
-		Name string `json:"name"`
-		Repo struct {
-			Provider string `json:"provider"`
-			RepoURL  string `json:"repo_url"`
-			Branch   string `json:"branch"`
-			Dir      string `json:"dir"`
-			Cmd      string `json:"cmd"`
-		} `json:"repo"`
-	}
-
-	type createSiteResponse struct {
-		URL string `json:"url"`
-	}
-
-	reqBody := createSiteRequest{
-		Name: siteName,
-	}
-	reqBody.Repo.Provider = "github"
-	reqBody.Repo.RepoURL = repoURL
-	reqBody.Repo.Branch = "main"
-	reqBody.Repo.Dir = "_site"
-	reqBody.Repo.Cmd = "yarn build"
-
-	jsonBody, err := json.Marshal(reqBody)
-	if err != nil {
-		return "", fmt.Errorf("failed to marshal request: %v", err)
-	}
-
-	req, err := http.NewRequest("POST", "https://api.netlify.com/api/v1/sites", bytes.NewBuffer(jsonBody))
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %v", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to send request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		body, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("failed to create site: %s", string(body))
-	}
-
-	var site createSiteResponse
-	if err := json.NewDecoder(resp.Body).Decode(&site); err != nil {
-		return "", fmt.Errorf("failed to decode response: %v", err)
-	}
-
-	return site.URL, nil
-}
-
-func getGitHubToken() (string, error) {
-	// These would be your app's client ID - it's okay to hardcode this
-	// You'll need to register your app at https://github.com/settings/applications/new
-	clientID := "Ov23likuN3kpIirlvEv0"
-
-	// Request device and user codes
-	deviceCodeResp, err := requestDeviceCode(clientID)
-	if err != nil {
-		return "", fmt.Errorf("error requesting device code: %v", err)
-	}
-
-	// Show instructions to user
-	fmt.Printf("\nFirst copy your one-time code: %s\n", deviceCodeResp.UserCode)
-	fmt.Printf("Press Enter to open github.com in your browser...\n")
-	fmt.Scanln() // Wait for Enter
-
-	// Open browser
-	url := deviceCodeResp.VerificationURI
-	if err := openBrowser(url); err != nil {
-		fmt.Printf("Failed to open browser. Please visit: %s\n", url)
-	}
-
-	// Poll for token
-	token, err := pollForToken(clientID, deviceCodeResp.DeviceCode, deviceCodeResp.Interval)
-	if err != nil {
-		return "", fmt.Errorf("error polling for token: %v", err)
-	}
-
-	return token, nil
-}
-
-type deviceCodeResponse struct {
+type DeviceCodeResponse struct {
 	DeviceCode      string `json:"device_code"`
 	UserCode        string `json:"user_code"`
 	VerificationURI string `json:"verification_uri"`
@@ -204,91 +29,350 @@ type deviceCodeResponse struct {
 	Interval        int    `json:"interval"`
 }
 
-func requestDeviceCode(clientID string) (*deviceCodeResponse, error) {
-	resp, err := http.PostForm("https://github.com/login/device/code", url.Values{"client_id": {clientID}})
+type TokenResponse struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	Scope       string `json:"scope"`
+}
+
+type NetlifyDeviceCodeResponse struct {
+	DeviceCode      string `json:"device_code"`
+	VerificationURI string `json:"verification_uri"`
+	UserCode        string `json:"user_code"`
+	ExpiresIn       string `json:"expires_in"`
+	Interval        string `json:"interval"`
+}
+
+func runDeploy(args []string) error {
+	// GitHub OAuth Device Flow
+	githubClientID := "Ov23likuN3kpIirlvEv0"
+	deviceCode, err := getGitHubDeviceCode(githubClientID)
+	if err != nil {
+		return fmt.Errorf("failed to get device code: %w", err)
+	}
+
+	fmt.Printf("\nPlease visit: %s\n", deviceCode.VerificationURI)
+	fmt.Printf("And enter code: %s\n", deviceCode.UserCode)
+
+	// Poll for GitHub token
+	githubToken, err := pollForGitHubToken(githubClientID, deviceCode)
+	if err != nil {
+		return fmt.Errorf("failed to get GitHub token: %w", err)
+	}
+
+	// Create GitHub repository
+	ctx := context.Background()
+	client := github.NewTokenClient(ctx, githubToken)
+
+	// Get current directory name for repo name
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+	repoName := filepath.Base(currentDir)
+
+	// Create private repository
+	repo, _, err := client.Repositories.Create(ctx, "", &github.Repository{
+		Name:    &repoName,
+		Private: github.Bool(true),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create repository: %w", err)
+	}
+
+	fmt.Printf("\nCreated GitHub repository: %s\n", *repo.HTMLURL)
+
+	// Initialize git and push
+	if err := initAndPushToGitHub(*repo.CloneURL); err != nil {
+		return fmt.Errorf("failed to initialize and push to GitHub: %w", err)
+	}
+
+	// Get Netlify Personal Access Token
+	fmt.Printf("\nPlease visit: https://app.netlify.com/user/applications/personal")
+	fmt.Printf("\nCreate a Personal Access Token and enter it here: ")
+	var netlifyToken string
+	if _, err := fmt.Scanln(&netlifyToken); err != nil {
+		return fmt.Errorf("failed to read Netlify token: %w", err)
+	}
+
+	// Netlify OAuth Device Flow
+	// netlifyClientID := "GiCAYjfVFqU4xupFsPzFYYg5Zepxh8_Aqc8rYCx0mmQ"
+
+	// Get device code
+	// deviceCode, err := getNetlifyDeviceCode(netlifyClientID)
+	// if err != nil {
+	// 	panic(err)
+	// 	return fmt.Errorf("failed to get Netlify device code: %w", err)
+	// }
+
+	// fmt.Printf("\nPlease visit: %s\n", deviceCode.VerificationURI)
+	// fmt.Printf("And enter code: %s\n", deviceCode.UserCode)
+
+	// // Poll for Netlify token
+	// netlifyToken, err := pollForNetlifyToken(netlifyClientID, deviceCode)
+	// if err != nil {
+	// 	panic(err)
+	// 	return fmt.Errorf("failed to get Netlify token: %w", err)
+	// }
+	// panic(netlifyToken)
+
+	// netlify init
+
+	// Create Netlify site using their API
+	netlifyAPI := "https://api.netlify.com/api/v1"
+	siteData := map[string]interface{}{
+		"name": "modular_cms_test_5",
+		"repo": map[string]interface{}{
+			"provider":    "github",
+			"repo_url":    repo.HTMLURL,
+			"repo_branch": "main",
+		},
+		"build_settings": map[string]interface{}{
+			"cmd":             "yarn run build",
+			"dir":             "_site",
+			"base_rel_dir":    true,
+			"stop_builds":     false,
+			"public_repo":     false,
+			"provider":        "github",
+			"repo_type":       "git",
+			"repo_url":        repo.HTMLURL,
+			"repo_branch":     "main",
+			"repo_owner_type": "Organization",
+			// "repo_visual_editor_template": null,
+			// "repo_template_required_extensions": null,
+			// "repo_template_usage_url": null,
+			// "repo_template_created_from_git_host": null,
+			// "repo_template_created_from_slug": null,
+			// "base": "",
+			// "deploy_key_id": null
+		},
+	}
+
+	siteJSON, _ := json.Marshal(siteData)
+	req, _ := http.NewRequest("POST", netlifyAPI+"/sites", strings.NewReader(string(siteJSON)))
+	req.Header.Set("Authorization", "Bearer "+netlifyToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to create Netlify site: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read Netlify response: %w", err)
+	}
+	fmt.Printf("Netlify response: %s\n", string(body))
+
+	var site struct {
+		URL string `json:"url"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&site); err != nil {
+		return fmt.Errorf("failed to decode Netlify response: %w", err)
+	}
+
+	fmt.Printf("\nSuccess! Your site is deployed at: %s\n", site.URL)
+	// fmt.Printf("GitHub repository: %s\n", *repo.HTMLURL)
+
+	return nil
+}
+
+func getGitHubDeviceCode(clientID string) (*DeviceCodeResponse, error) {
+	data := strings.NewReader(fmt.Sprintf("client_id=%s&scope=repo", clientID))
+	req, err := http.NewRequest("POST", "https://github.com/login/device/code", data)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var deviceCode DeviceCodeResponse
+	if err := json.NewDecoder(resp.Body).Decode(&deviceCode); err != nil {
+		return nil, err
+	}
+
+	return &deviceCode, nil
+}
+
+func pollForGitHubToken(clientID string, deviceCode *DeviceCodeResponse) (string, error) {
+	expiration := time.Now().Add(time.Duration(deviceCode.ExpiresIn) * time.Second)
+
+	for time.Now().Before(expiration) {
+		data := strings.NewReader(fmt.Sprintf(
+			"client_id=%s&device_code=%s&grant_type=urn:ietf:params:oauth:grant-type:device_code",
+			clientID,
+			deviceCode.DeviceCode,
+		))
+
+		req, err := http.NewRequest("POST", "https://github.com/login/oauth/access_token", data)
+		if err != nil {
+			return "", err
+		}
+		req.Header.Set("Accept", "application/json")
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			return "", err
+		}
+
+		var tokenResp TokenResponse
+		if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+			resp.Body.Close()
+			return "", err
+		}
+		resp.Body.Close()
+
+		if tokenResp.AccessToken != "" {
+			return tokenResp.AccessToken, nil
+		}
+
+		time.Sleep(time.Duration(deviceCode.Interval) * time.Second)
+	}
+
+	return "", fmt.Errorf("authentication timeout")
+}
+
+func initAndPushToGitHub(cloneURL string) error {
+	commands := []struct {
+		name string
+		args []string
+	}{
+		{"git", []string{"remote", "add", "origin", cloneURL}},
+		{"git", []string{"push", "-u", "origin", "main"}},
+	}
+
+	for _, cmd := range commands {
+		command := exec.Command(cmd.name, cmd.args...)
+		command.Stdout = os.Stdout
+		command.Stderr = os.Stderr
+		if err := command.Run(); err != nil {
+			return fmt.Errorf("failed to run '%s %s': %w", cmd.name, strings.Join(cmd.args, " "), err)
+		}
+	}
+
+	return nil
+}
+
+func getNetlifyDeviceCode(clientID string) (*NetlifyDeviceCodeResponse, error) {
+	req, err := http.NewRequest("GET", "https://app.netlify.com/authorize", nil)
+	if err != nil {
+		return nil, err
+	}
+	q := req.URL.Query()
+	q.Add("client_id", clientID)
+	q.Add("response_type", "code")
+	q.Add("redirect_uri", "urn:ietf:wg:oauth:2.0:oob")
+	req.URL.RawQuery = q.Encode()
+
+	fmt.Printf("Opening browser to: %s\n", req.URL.String())
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "linux":
+		cmd = exec.Command("xdg-open", req.URL.String())
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", req.URL.String())
+	case "darwin":
+		cmd = exec.Command("open", req.URL.String())
+	default:
+		fmt.Printf("Please open this URL in your browser: %s\n", req.URL.String())
+	}
+	if cmd != nil {
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("Failed to open browser, please visit: %s\n", req.URL.String())
+		}
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
+	panic(string(body))
 	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v", err)
+		return nil, err
 	}
-	// Parse response body as URL-encoded form values
 	values, err := url.ParseQuery(string(body))
 	if err != nil {
-		return nil, fmt.Errorf("error parsing response body: %v", err)
+		return nil, err
 	}
-
-	// Convert form values to deviceCodeResponse struct
-	deviceCodeResponse := &deviceCodeResponse{
+	deviceCode := NetlifyDeviceCodeResponse{
 		DeviceCode:      values.Get("device_code"),
 		UserCode:        values.Get("user_code"),
 		VerificationURI: values.Get("verification_uri"),
+		ExpiresIn:       values.Get("expires_in"),
+		Interval:        values.Get("interval"),
 	}
 
-	// Parse numeric fields
-	if expiresIn, err := strconv.Atoi(values.Get("expires_in")); err == nil {
-		deviceCodeResponse.ExpiresIn = expiresIn
-	}
-	if interval, err := strconv.Atoi(values.Get("interval")); err == nil {
-		deviceCodeResponse.Interval = interval
-	}
-
-	return deviceCodeResponse, nil
+	return &deviceCode, nil
 }
 
-func pollForToken(clientID, deviceCode string, interval int) (string, error) {
-	for {
-		resp, err := http.PostForm("https://github.com/login/oauth/access_token",
-			url.Values{
-				"client_id":   {clientID},
-				"device_code": {deviceCode},
-				"grant_type":  {"urn:ietf:params:oauth:grant-type:device_code"},
-			})
+func parseInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
+func pollForNetlifyToken(clientID string, deviceCode *NetlifyDeviceCodeResponse) (string, error) {
+	expiration := time.Now().Add(time.Duration(parseInt(deviceCode.ExpiresIn)) * time.Second)
+
+	for time.Now().Before(expiration) {
+		req, err := http.NewRequest("POST", "https://api.netlify.com/oauth/device/token", nil)
+		if err != nil {
+			return "", err
+		}
+		q := req.URL.Query()
+		q.Add("client_id", clientID)
+		q.Add("device_code", deviceCode.DeviceCode)
+		q.Add("grant_type", "device_code")
+		req.URL.RawQuery = q.Encode()
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
 		if err != nil {
 			return "", err
 		}
 
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			panic(fmt.Sprintf("Failed to read response body: %v", err))
+		var tokenResp TokenResponse
+		if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+			resp.Body.Close()
+			return "", err
+		}
+		resp.Body.Close()
+
+		if tokenResp.AccessToken != "" {
+			return tokenResp.AccessToken, nil
 		}
 
-		// Parse response body as URL-encoded form values
-		values, err := url.ParseQuery(string(body))
-		if err != nil {
-			return "", fmt.Errorf("error parsing response body: %v", err)
-		}
-
-		accessToken := values.Get("access_token")
-		if accessToken != "" {
-			return accessToken, nil
-		}
-
-		error := values.Get("error")
-		if error != "authorization_pending" {
-			return "", fmt.Errorf("authorization failed: %s", error)
-		}
-
-		time.Sleep(time.Duration(interval) * time.Second)
+		time.Sleep(time.Duration(parseInt(deviceCode.Interval)) * time.Second)
 	}
+
+	return "", fmt.Errorf("authentication timeout")
 }
 
-func openBrowser(url string) error {
-	var cmd string
-	var args []string
+var deployCmd = &cobra.Command{
+	Use:   "deploy",
+	Short: "Deploy your site to a hosting provider",
+	Long:  "Deploy your site to a hosting provider (currently supports Netlify)",
+	Run: func(cmd *cobra.Command, args []string) {
+		runDeploy(args)
+	},
+}
 
-	switch runtime.GOOS {
-	case "windows":
-		cmd = "cmd"
-		args = []string{"/c", "start"}
-	case "darwin":
-		cmd = "open"
-	default: // "linux", "freebsd", "openbsd", "netbsd"
-		cmd = "xdg-open"
-	}
-	args = append(args, url)
-	return exec.Command(cmd, args...).Start()
+func init() {
+	rootCmd.AddCommand(deployCmd)
 }
