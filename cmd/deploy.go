@@ -44,56 +44,73 @@ type NetlifyDeviceCodeResponse struct {
 }
 
 func runDeploy(args []string) error {
-	// GitHub OAuth Device Flow
-	githubClientID := "Ov23likuN3kpIirlvEv0"
-	deviceCode, err := getGitHubDeviceCode(githubClientID)
-	if err != nil {
-		return fmt.Errorf("failed to get device code: %w", err)
+	// Check if git is initialized and has a remote origin
+	cmd := exec.Command("git", "remote", "get-url", "origin")
+	output, err := cmd.CombinedOutput()
+
+	// If there's no error, a remote origin exists
+	if err == nil && len(output) > 0 {
+		fmt.Println("Git repository already has a remote origin, skipping GitHub repository creation")
+	} else {
+		// GitHub OAuth Device Flow
+		githubClientID := "Ov23likuN3kpIirlvEv0"
+		deviceCode, err := getGitHubDeviceCode(githubClientID)
+		if err != nil {
+			return fmt.Errorf("failed to get device code: %w", err)
+		}
+
+		fmt.Printf("\nPlease visit: %s\n", deviceCode.VerificationURI)
+		fmt.Printf("And enter code: %s\n", deviceCode.UserCode)
+
+		// Poll for GitHub token
+		githubToken, err := pollForGitHubToken(githubClientID, deviceCode)
+		if err != nil {
+			return fmt.Errorf("failed to get GitHub token: %w", err)
+		}
+
+		// Create GitHub repository
+		ctx := context.Background()
+		client := github.NewTokenClient(ctx, githubToken)
+
+		// Get current directory name for repo name
+		currentDir, err := os.Getwd()
+		if err != nil {
+			return fmt.Errorf("failed to get current directory: %w", err)
+		}
+		repoName := filepath.Base(currentDir)
+
+		// Create private repository
+		repo, _, err := client.Repositories.Create(ctx, "", &github.Repository{
+			Name:    &repoName,
+			Private: &[]bool{true}[0],
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create repository: %w", err)
+		}
+
+		fmt.Printf("\nCreated GitHub repository: %s\n", *repo.SSHURL)
+
+		// Initialize git and push
+		if err := initAndPushToGitHub(*repo.SSHURL); err != nil {
+			return fmt.Errorf("failed to initialize and push to GitHub: %w", err)
+		}
 	}
 
-	fmt.Printf("\nPlease visit: %s\n", deviceCode.VerificationURI)
-	fmt.Printf("And enter code: %s\n", deviceCode.UserCode)
-
-	// Poll for GitHub token
-	githubToken, err := pollForGitHubToken(githubClientID, deviceCode)
-	if err != nil {
-		return fmt.Errorf("failed to get GitHub token: %w", err)
+	// Run netlify init command
+	netlifyCmd := exec.Command("netlify", "init")
+	netlifyCmd.Stdout = os.Stdout
+	netlifyCmd.Stderr = os.Stderr
+	netlifyCmd.Stdin = os.Stdin
+	if err := netlifyCmd.Run(); err != nil {
+		return fmt.Errorf("failed to run netlify init: %w", err)
 	}
-
-	// Create GitHub repository
-	ctx := context.Background()
-	client := github.NewTokenClient(ctx, githubToken)
-
-	// Get current directory name for repo name
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("failed to get current directory: %w", err)
-	}
-	repoName := filepath.Base(currentDir)
-
-	// Create private repository
-	repo, _, err := client.Repositories.Create(ctx, "", &github.Repository{
-		Name:    &repoName,
-		Private: &[]bool{true}[0],
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create repository: %w", err)
-	}
-
-	fmt.Printf("\nCreated GitHub repository: %s\n", *repo.SSHURL)
-
-	// Initialize git and push
-	if err := initAndPushToGitHub(*repo.SSHURL); err != nil {
-		return fmt.Errorf("failed to initialize and push to GitHub: %w", err)
-	}
-
 	// Get Netlify Personal Access Token
-	fmt.Printf("\nPlease visit: https://app.netlify.com/user/applications/personal")
-	fmt.Printf("\nCreate a Personal Access Token and enter it here: ")
-	var netlifyToken string
-	if _, err := fmt.Scanln(&netlifyToken); err != nil {
-		return fmt.Errorf("failed to read Netlify token: %w", err)
-	}
+	// fmt.Printf("\nPlease visit: https://app.netlify.com/user/applications/personal")
+	// fmt.Printf("\nCreate a Personal Access Token and enter it here: ")
+	// var netlifyToken string
+	// if _, err := fmt.Scanln(&netlifyToken); err != nil {
+	// 	return fmt.Errorf("failed to read Netlify token: %w", err)
+	// }
 
 	// Netlify OAuth Device Flow
 	// netlifyClientID := "GiCAYjfVFqU4xupFsPzFYYg5Zepxh8_Aqc8rYCx0mmQ"
@@ -119,61 +136,61 @@ func runDeploy(args []string) error {
 	// netlify init
 
 	// Create Netlify site using their API
-	netlifyAPI := "https://api.netlify.com/api/v1"
-	siteData := map[string]interface{}{
-		"name": "modular_cms_test_5",
-		"repo": map[string]interface{}{
-			"provider":    "github",
-			"repo_url":    repo.HTMLURL,
-			"repo_branch": "main",
-		},
-		"build_settings": map[string]interface{}{
-			"cmd":             "yarn run build",
-			"dir":             "_site",
-			"base_rel_dir":    true,
-			"stop_builds":     false,
-			"public_repo":     false,
-			"provider":        "github",
-			"repo_type":       "git",
-			"repo_url":        repo.HTMLURL,
-			"repo_branch":     "main",
-			"repo_owner_type": "Organization",
-			// "repo_visual_editor_template": null,
-			// "repo_template_required_extensions": null,
-			// "repo_template_usage_url": null,
-			// "repo_template_created_from_git_host": null,
-			// "repo_template_created_from_slug": null,
-			// "base": "",
-			// "deploy_key_id": null
-		},
-	}
+	// netlifyAPI := "https://api.netlify.com/api/v1"
+	// siteData := map[string]interface{}{
+	// 	"name": "modular_cms_test_5",
+	// 	"repo": map[string]interface{}{
+	// 		"provider":    "github",
+	// 		"repo_url":    repo.HTMLURL,
+	// 		"repo_branch": "main",
+	// 	},
+	// 	"build_settings": map[string]interface{}{
+	// 		"cmd":             "yarn run build",
+	// 		"dir":             "_site",
+	// 		"base_rel_dir":    true,
+	// 		"stop_builds":     false,
+	// 		"public_repo":     false,
+	// 		"provider":        "github",
+	// 		"repo_type":       "git",
+	// 		"repo_url":        repo.HTMLURL,
+	// 		"repo_branch":     "main",
+	// 		"repo_owner_type": "Organization",
+	// 		// "repo_visual_editor_template": null,
+	// 		// "repo_template_required_extensions": null,
+	// 		// "repo_template_usage_url": null,
+	// 		// "repo_template_created_from_git_host": null,
+	// 		// "repo_template_created_from_slug": null,
+	// 		// "base": "",
+	// 		// "deploy_key_id": null
+	// 	},
+	// }
 
-	siteJSON, _ := json.Marshal(siteData)
-	req, _ := http.NewRequest("POST", netlifyAPI+"/sites", strings.NewReader(string(siteJSON)))
-	req.Header.Set("Authorization", "Bearer "+netlifyToken)
-	req.Header.Set("Content-Type", "application/json")
+	// siteJSON, _ := json.Marshal(siteData)
+	// req, _ := http.NewRequest("POST", netlifyAPI+"/sites", strings.NewReader(string(siteJSON)))
+	// req.Header.Set("Authorization", "Bearer "+netlifyToken)
+	// req.Header.Set("Content-Type", "application/json")
 
-	httpClient := &http.Client{}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to create Netlify site: %w", err)
-	}
-	defer resp.Body.Close()
+	// httpClient := &http.Client{}
+	// resp, err := httpClient.Do(req)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to create Netlify site: %w", err)
+	// }
+	// defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read Netlify response: %w", err)
-	}
-	fmt.Printf("Netlify response: %s\n", string(body))
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to read Netlify response: %w", err)
+	// }
+	// fmt.Printf("Netlify response: %s\n", string(body))
 
-	var site struct {
-		URL string `json:"url"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&site); err != nil {
-		return fmt.Errorf("failed to decode Netlify response: %w", err)
-	}
+	// var site struct {
+	// 	URL string `json:"url"`
+	// }
+	// if err := json.NewDecoder(resp.Body).Decode(&site); err != nil {
+	// 	return fmt.Errorf("failed to decode Netlify response: %w", err)
+	// }
 
-	fmt.Printf("\nSuccess! Your site is deployed at: %s\n", site.URL)
+	// fmt.Printf("\nSuccess! Your site is deployed at: %s\n", site.URL)
 	// fmt.Printf("GitHub repository: %s\n", *repo.HTMLURL)
 
 	return nil
