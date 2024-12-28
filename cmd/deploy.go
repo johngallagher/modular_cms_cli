@@ -74,16 +74,16 @@ func runDeploy(args []string) error {
 	// Create private repository
 	repo, _, err := client.Repositories.Create(ctx, "", &github.Repository{
 		Name:    &repoName,
-		Private: github.Bool(true),
+		Private: &[]bool{true}[0],
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create repository: %w", err)
 	}
 
-	fmt.Printf("\nCreated GitHub repository: %s\n", *repo.HTMLURL)
+	fmt.Printf("\nCreated GitHub repository: %s\n", *repo.SSHURL)
 
 	// Initialize git and push
-	if err := initAndPushToGitHub(*repo.CloneURL); err != nil {
+	if err := initAndPushToGitHub(*repo.SSHURL); err != nil {
 		return fmt.Errorf("failed to initialize and push to GitHub: %w", err)
 	}
 
