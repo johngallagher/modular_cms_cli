@@ -43,10 +43,17 @@ type NetlifyDeviceCodeResponse struct {
 	Interval        string `json:"interval"`
 }
 
-func runDeploy(args []string) error {
+func runDeploy(cmd *cobra.Command, args []string) error {
+	// Get current directory name for repo name
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+	repoName := filepath.Base(currentDir)
+
 	// Check if git is initialized and has a remote origin
-	cmd := exec.Command("git", "remote", "get-url", "origin")
-	output, err := cmd.CombinedOutput()
+	gitCmd := exec.Command("git", "remote", "get-url", "origin")
+	output, err := gitCmd.CombinedOutput()
 
 	// If there's no error, a remote origin exists
 	if err == nil && len(output) > 0 {
@@ -72,13 +79,6 @@ func runDeploy(args []string) error {
 		ctx := context.Background()
 		client := github.NewTokenClient(ctx, githubToken)
 
-		// Get current directory name for repo name
-		currentDir, err := os.Getwd()
-		if err != nil {
-			return fmt.Errorf("failed to get current directory: %w", err)
-		}
-		repoName := filepath.Base(currentDir)
-
 		// Create private repository
 		repo, _, err := client.Repositories.Create(ctx, "", &github.Repository{
 			Name:    &repoName,
@@ -96,103 +96,115 @@ func runDeploy(args []string) error {
 		}
 	}
 
-	// Run netlify init command
-	netlifyCmd := exec.Command("netlify", "init")
-	netlifyCmd.Stdout = os.Stdout
-	netlifyCmd.Stderr = os.Stderr
-	netlifyCmd.Stdin = os.Stdin
-	if err := netlifyCmd.Run(); err != nil {
-		return fmt.Errorf("failed to run netlify init: %w", err)
+	to, err := cmd.Flags().GetString("to")
+	if err != nil {
+		return fmt.Errorf("failed to get 'to' flag: %w", err)
 	}
-	// Get Netlify Personal Access Token
-	// fmt.Printf("\nPlease visit: https://app.netlify.com/user/applications/personal")
-	// fmt.Printf("\nCreate a Personal Access Token and enter it here: ")
-	// var netlifyToken string
-	// if _, err := fmt.Scanln(&netlifyToken); err != nil {
-	// 	return fmt.Errorf("failed to read Netlify token: %w", err)
-	// }
 
-	// Netlify OAuth Device Flow
-	// netlifyClientID := "GiCAYjfVFqU4xupFsPzFYYg5Zepxh8_Aqc8rYCx0mmQ"
+	if to == "netlify" {
+		siteName := strings.ReplaceAll(repoName, "_", "-")
+		// Run netlify init command
+		netlifyCmd := exec.Command("netlify", "sites:create", "--name", siteName)
+		netlifyCmd.Stdout = os.Stdout
+		netlifyCmd.Stderr = os.Stderr
+		netlifyCmd.Stdin = os.Stdin
+		if err := netlifyCmd.Run(); err != nil {
+			return fmt.Errorf("failed to run netlify sites:create: %w", err)
+		}
 
-	// Get device code
-	// deviceCode, err := getNetlifyDeviceCode(netlifyClientID)
-	// if err != nil {
-	// 	panic(err)
-	// 	return fmt.Errorf("failed to get Netlify device code: %w", err)
-	// }
+		netlifyCmd = exec.Command("netlify", "init")
+		netlifyCmd.Stdout = os.Stdout
+		netlifyCmd.Stderr = os.Stderr
+		netlifyCmd.Stdin = os.Stdin
+		if err := netlifyCmd.Run(); err != nil {
+			return fmt.Errorf("failed to run netlify init: %w", err)
+		}
+	}
+	if to == "github" {
+		// Run build command
+		buildCmd := exec.Command("bin/build")
+		buildCmd.Stdout = os.Stdout
+		buildCmd.Stderr = os.Stderr
+		if err := buildCmd.Run(); err != nil {
+			return fmt.Errorf("failed to run build command: %w", err)
+		}
 
-	// fmt.Printf("\nPlease visit: %s\n", deviceCode.VerificationURI)
-	// fmt.Printf("And enter code: %s\n", deviceCode.UserCode)
+		// Create docs directory and copy _site contents
+		if err := os.RemoveAll("docs"); err != nil {
+			return fmt.Errorf("failed to remove existing docs directory: %w", err)
+		}
+		if err := os.MkdirAll("docs", 0755); err != nil {
+			return fmt.Errorf("failed to create docs directory: %w", err)
+		}
 
-	// // Poll for Netlify token
-	// netlifyToken, err := pollForNetlifyToken(netlifyClientID, deviceCode)
-	// if err != nil {
-	// 	panic(err)
-	// 	return fmt.Errorf("failed to get Netlify token: %w", err)
-	// }
-	// panic(netlifyToken)
+		// Copy _site contents to docs
+		cpCmd := exec.Command("cp", "-r", "_site/.", "docs/")
+		if err := cpCmd.Run(); err != nil {
+			return fmt.Errorf("failed to copy _site contents to docs: %w", err)
+		}
 
-	// netlify init
+		// Git add and commit
+		gitAddCmd := exec.Command("git", "add", "docs")
+		if err := gitAddCmd.Run(); err != nil {
+			return fmt.Errorf("failed to git add docs directory: %w", err)
+		}
 
-	// Create Netlify site using their API
-	// netlifyAPI := "https://api.netlify.com/api/v1"
-	// siteData := map[string]interface{}{
-	// 	"name": "modular_cms_test_5",
-	// 	"repo": map[string]interface{}{
-	// 		"provider":    "github",
-	// 		"repo_url":    repo.HTMLURL,
-	// 		"repo_branch": "main",
-	// 	},
-	// 	"build_settings": map[string]interface{}{
-	// 		"cmd":             "yarn run build",
-	// 		"dir":             "_site",
-	// 		"base_rel_dir":    true,
-	// 		"stop_builds":     false,
-	// 		"public_repo":     false,
-	// 		"provider":        "github",
-	// 		"repo_type":       "git",
-	// 		"repo_url":        repo.HTMLURL,
-	// 		"repo_branch":     "main",
-	// 		"repo_owner_type": "Organization",
-	// 		// "repo_visual_editor_template": null,
-	// 		// "repo_template_required_extensions": null,
-	// 		// "repo_template_usage_url": null,
-	// 		// "repo_template_created_from_git_host": null,
-	// 		// "repo_template_created_from_slug": null,
-	// 		// "base": "",
-	// 		// "deploy_key_id": null
-	// 	},
-	// }
+		gitCommitCmd := exec.Command("git", "commit", "-m", "Add docs directory for GitHub Pages")
+		if err := gitCommitCmd.Run(); err != nil {
+			return fmt.Errorf("failed to commit docs directory: %w", err)
+		}
 
-	// siteJSON, _ := json.Marshal(siteData)
-	// req, _ := http.NewRequest("POST", netlifyAPI+"/sites", strings.NewReader(string(siteJSON)))
-	// req.Header.Set("Authorization", "Bearer "+netlifyToken)
-	// req.Header.Set("Content-Type", "application/json")
+		// Push changes
+		gitPushCmd := exec.Command("git", "push", "origin", "main")
+		if err := gitPushCmd.Run(); err != nil {
+			return fmt.Errorf("failed to push changes: %w", err)
+		}
 
-	// httpClient := &http.Client{}
-	// resp, err := httpClient.Do(req)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to create Netlify site: %w", err)
-	// }
-	// defer resp.Body.Close()
+		// Get GitHub token for enabling Pages
+		githubClientID := "Ov23likuN3kpIirlvEv0"
+		deviceCode, err := getGitHubDeviceCode(githubClientID)
+		if err != nil {
+			return fmt.Errorf("failed to get device code: %w", err)
+		}
 
-	// body, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to read Netlify response: %w", err)
-	// }
-	// fmt.Printf("Netlify response: %s\n", string(body))
+		fmt.Printf("\nPlease visit: %s\n", deviceCode.VerificationURI)
+		fmt.Printf("And enter code: %s\n", deviceCode.UserCode)
 
-	// var site struct {
-	// 	URL string `json:"url"`
-	// }
-	// if err := json.NewDecoder(resp.Body).Decode(&site); err != nil {
-	// 	return fmt.Errorf("failed to decode Netlify response: %w", err)
-	// }
+		githubToken, err := pollForGitHubToken(githubClientID, deviceCode)
+		if err != nil {
+			return fmt.Errorf("failed to get GitHub token: %w", err)
+		}
 
-	// fmt.Printf("\nSuccess! Your site is deployed at: %s\n", site.URL)
-	// fmt.Printf("GitHub repository: %s\n", *repo.HTMLURL)
+		// Get repo owner and name from remote URL
+		gitRemoteCmd := exec.Command("git", "remote", "get-url", "origin")
+		output, err := gitRemoteCmd.Output()
+		if err != nil {
+			return fmt.Errorf("failed to get remote URL: %w", err)
+		}
 
+		remoteURL := strings.TrimSpace(string(output))
+		parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(remoteURL, "git@github.com:"), ".git"), "/")
+		owner := parts[0]
+		repoName := parts[1]
+
+		// Enable GitHub Pages
+		ctx := context.Background()
+		client := github.NewTokenClient(ctx, githubToken)
+		pages := &github.Pages{
+			BuildType: github.Ptr("legacy"),
+			Source: &github.PagesSource{
+				Branch: github.Ptr("main"),
+				Path:   github.Ptr("/docs"),
+			},
+		}
+
+		_, _, err = client.Repositories.EnablePages(ctx, owner, repoName, pages)
+		if err != nil {
+			return fmt.Errorf("failed to enable GitHub Pages: %w", err)
+		}
+
+		fmt.Printf("\nEnabled GitHub Pages for repository. Site will be available at https://%s.github.io/%s\n", owner, repoName)
+	}
 	return nil
 }
 
@@ -384,10 +396,24 @@ func pollForNetlifyToken(clientID string, deviceCode *NetlifyDeviceCodeResponse)
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy your site to a hosting provider",
-	Long:  "Deploy your site to a hosting provider (currently supports Netlify)",
+	Long:  "Deploy your site to a hosting provider (currently supports Netlify and GitHub Pages)",
 	Run: func(cmd *cobra.Command, args []string) {
-		runDeploy(args)
+		runDeploy(cmd, args)
 	},
+}
+
+func init() {
+	deployCmd.Flags().String("to", "netlify", "Provider to deploy to (netlify or github)")
+	deployCmd.MarkFlagRequired("to")
+
+	// Add validation for the 'to' flag
+	deployCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		provider, _ := cmd.Flags().GetString("to")
+		if provider != "netlify" && provider != "github" {
+			return fmt.Errorf("invalid provider %q - must be either 'netlify' or 'github'", provider)
+		}
+		return nil
+	}
 }
 
 func init() {

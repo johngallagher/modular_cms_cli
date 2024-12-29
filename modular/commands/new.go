@@ -87,8 +87,9 @@ func CreateNewSite(path string) {
 	fmt.Printf("Created new Modular site at %s\n", absPath)
 	fmt.Println("\nNext Steps:")
 	fmt.Printf(" cd %s\n", absPath)
-	fmt.Println(" bin/serve             # serve the site")
-	fmt.Println(" modular_cli page edit # edit the index.md file")
+	fmt.Println(" bin/serve                        # serve the site")
+	fmt.Println(" modular_cli page edit            # edit the index.md file")
+	fmt.Println(" modular_cli deploy --to=netlify  # deploy - use --to=github for Github pages")
 }
 
 func createPublicDir(path string) {
