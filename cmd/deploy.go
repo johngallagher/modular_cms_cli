@@ -4,18 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
-	"strconv"
 
 	"path/filepath"
 	"strings"
 	"time"
-
-	"runtime"
 
 	"github.com/google/go-github/v68/github"
 	"github.com/spf13/cobra"
@@ -119,6 +114,24 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		if err := netlifyCmd.Run(); err != nil {
 			return fmt.Errorf("failed to run netlify init: %w", err)
 		}
+
+		// Push changes
+		gitPushCmd := exec.Command("git", "push", "-u", "origin", "main")
+		gitPushCmd.Stdout = os.Stdout
+		gitPushCmd.Stderr = os.Stderr
+		gitPushCmd.Stdin = os.Stdin
+		if err := gitPushCmd.Run(); err != nil {
+			return fmt.Errorf("failed to push changes: %w", err)
+		}
+
+		// Run netlify watch command
+		netlifyWatchCmd := exec.Command("netlify", "watch")
+		netlifyWatchCmd.Stdout = os.Stdout
+		netlifyWatchCmd.Stderr = os.Stderr
+		netlifyWatchCmd.Stdin = os.Stdin
+		if err := netlifyWatchCmd.Run(); err != nil {
+			return fmt.Errorf("failed to run netlify watch: %w", err)
+		}
 	}
 	if to == "github" {
 		// Run build command
@@ -155,7 +168,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		}
 
 		// Push changes
-		gitPushCmd := exec.Command("git", "push", "origin", "main")
+		gitPushCmd := exec.Command("git", "push", "-u", "origin", "main")
 		if err := gitPushCmd.Run(); err != nil {
 			return fmt.Errorf("failed to push changes: %w", err)
 		}
@@ -278,7 +291,6 @@ func initAndPushToGitHub(cloneURL string) error {
 		args []string
 	}{
 		{"git", []string{"remote", "add", "origin", cloneURL}},
-		{"git", []string{"push", "-u", "origin", "main"}},
 	}
 
 	for _, cmd := range commands {
@@ -293,106 +305,6 @@ func initAndPushToGitHub(cloneURL string) error {
 	return nil
 }
 
-func getNetlifyDeviceCode(clientID string) (*NetlifyDeviceCodeResponse, error) {
-	req, err := http.NewRequest("GET", "https://app.netlify.com/authorize", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
-	q.Add("client_id", clientID)
-	q.Add("response_type", "code")
-	q.Add("redirect_uri", "urn:ietf:wg:oauth:2.0:oob")
-	req.URL.RawQuery = q.Encode()
-
-	fmt.Printf("Opening browser to: %s\n", req.URL.String())
-	var cmd *exec.Cmd
-	switch runtime.GOOS {
-	case "linux":
-		cmd = exec.Command("xdg-open", req.URL.String())
-	case "windows":
-		cmd = exec.Command("cmd", "/c", "start", req.URL.String())
-	case "darwin":
-		cmd = exec.Command("open", req.URL.String())
-	default:
-		fmt.Printf("Please open this URL in your browser: %s\n", req.URL.String())
-	}
-	if cmd != nil {
-		if err := cmd.Run(); err != nil {
-			fmt.Printf("Failed to open browser, please visit: %s\n", req.URL.String())
-		}
-	}
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	panic(string(body))
-	if err != nil {
-		return nil, err
-	}
-	values, err := url.ParseQuery(string(body))
-	if err != nil {
-		return nil, err
-	}
-	deviceCode := NetlifyDeviceCodeResponse{
-		DeviceCode:      values.Get("device_code"),
-		UserCode:        values.Get("user_code"),
-		VerificationURI: values.Get("verification_uri"),
-		ExpiresIn:       values.Get("expires_in"),
-		Interval:        values.Get("interval"),
-	}
-
-	return &deviceCode, nil
-}
-
-func parseInt(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		panic(err)
-	}
-	return i
-}
-
-func pollForNetlifyToken(clientID string, deviceCode *NetlifyDeviceCodeResponse) (string, error) {
-	expiration := time.Now().Add(time.Duration(parseInt(deviceCode.ExpiresIn)) * time.Second)
-
-	for time.Now().Before(expiration) {
-		req, err := http.NewRequest("POST", "https://api.netlify.com/oauth/device/token", nil)
-		if err != nil {
-			return "", err
-		}
-		q := req.URL.Query()
-		q.Add("client_id", clientID)
-		q.Add("device_code", deviceCode.DeviceCode)
-		q.Add("grant_type", "device_code")
-		req.URL.RawQuery = q.Encode()
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			return "", err
-		}
-
-		var tokenResp TokenResponse
-		if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
-			resp.Body.Close()
-			return "", err
-		}
-		resp.Body.Close()
-
-		if tokenResp.AccessToken != "" {
-			return tokenResp.AccessToken, nil
-		}
-
-		time.Sleep(time.Duration(parseInt(deviceCode.Interval)) * time.Second)
-	}
-
-	return "", fmt.Errorf("authentication timeout")
-}
-
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy your site to a hosting provider",
@@ -403,7 +315,7 @@ var deployCmd = &cobra.Command{
 }
 
 func init() {
-	deployCmd.Flags().String("to", "netlify", "Provider to deploy to (netlify or github)")
+	deployCmd.Flags().String("to", "", "Provider to deploy to (netlify or github)")
 	deployCmd.MarkFlagRequired("to")
 
 	// Add validation for the 'to' flag
