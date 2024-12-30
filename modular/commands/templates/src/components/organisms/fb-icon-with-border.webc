@@ -1,0 +1,9 @@
+  <script webc:type="js">
+    if (!this.name) {
+      ``;
+    } else {
+      `<div class="inline-flex justify-center items-center mb-6 w-24 h-24 rounded-lg bg-primary-100 dark:bg-primary-900">
+          <fb-icon class="mx-auto w-16 h-16 text-primary-600 dark:text-primary-500" :name="feature.icon"></fb-icon>
+      </div>`
+    }
+  </script>

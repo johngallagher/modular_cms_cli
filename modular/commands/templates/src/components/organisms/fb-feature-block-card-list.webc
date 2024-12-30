@@ -1,0 +1,22 @@
+<section class="bg-gray-50 dark:bg-gray-900">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+        <div class="mx-auto max-w-screen-md text-center mb-8 lg:mb-16">
+            <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white"
+                @text="object.heading"></h2>
+            <p class="font-light text-gray-500 dark:text-gray-400 sm:text-xl" @text="object.subheading"></p>
+        </div>
+        <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 xl:gap-8 md:space-y-0">
+            <div webc:for="feature of object.features" class="p-6 bg-white rounded shadow dark:bg-gray-800">
+                <div webc:if="feature.icon"
+                    class="flex justify-center items-center mb-4 w-10 h-10 rounded bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
+
+                    <fb-icon class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300"
+                        :name="feature.icon"></fb-icon>
+
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white" @text="feature.heading"></h3>
+                <p class="font-light text-gray-500 dark:text-gray-400" @html="markdown(feature.summary)"></p>
+            </div>
+        </div>
+    </div>
+</section>
