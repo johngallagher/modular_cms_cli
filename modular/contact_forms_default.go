@@ -17,8 +17,16 @@ func (f ContactFormsDefault) FilterValue() string {
 	return f.Heading
 }
 
+func (f *ContactFormsDefault) Category() string {
+	return "Contact"
+}
+
+func (f ContactFormsDefault) View() string {
+	return "default"
+}
+
 func (f ContactFormsDefault) Title() string {
-	return "[" + f.DisplayName() + "] " + f.Heading
+	return "[" + f.Category() + "] [" + f.View() + "] " + f.Heading
 }
 
 func (f *ContactFormsDefault) TitlePointer() *string {

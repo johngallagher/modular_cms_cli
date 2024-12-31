@@ -121,5 +121,37 @@ func AllBlocks() []BlockInterface {
 			Heading:     "Contact us",
 			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
 		},
+		&HeroSectionsDefault{
+			Type:        "HeroSectionsDefault",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Hero Section",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+			Left: SideJustCTA{
+				CTA: CTA{
+					Text: "Learn More Today",
+					URL:  "#",
+				},
+			},
+			Right: SideJustCTA{
+				CTA: CTA{
+					Text: "Learn More Today",
+					URL:  "#",
+				},
+			},
+		},
+		&TestimonialSectionsBlockquote{
+			Type:        "TestimonialSectionsBlockquote",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Testimonial: Testimonial{
+				Content: "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+				Author: Author{
+					Name:     "Micheal Gough",
+					Title:    "CEO at Google",
+					ImageSrc: "https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gouch.png",
+				},
+			},
+		},
 	}
 }
