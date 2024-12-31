@@ -153,5 +153,31 @@ func AllBlocks() []BlockInterface {
 				},
 			},
 		},
+		&SocialProofCardStatistics{
+			Type:        "SocialProofCardStatistics",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Social Proof Card Statistics",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+			Note:        "Results based on a composite organization of 1,800 developers using GitHub over three years.",
+			Sentiment:   "neutral",
+			Statistics: Statistics{
+				Left: Statistic{
+					Value:       "40%",
+					Title:       "Reduction",
+					Description: "in developer onboarding time",
+				},
+				Center: Statistic{
+					Value:       "469%",
+					Title:       "Return on investment",
+					Description: "over 3 years",
+				},
+				Right: Statistic{
+					Value:       "60+",
+					Title:       "Minutes saved",
+					Description: "per developer, per day",
+				},
+			},
+		},
 	}
 }
