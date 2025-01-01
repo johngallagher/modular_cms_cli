@@ -1,0 +1,46 @@
+<fieldset class="question" :data-question="question.id">
+  <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 mb-3 md:mb-5 leding-tight dark:text-white"
+    @text="question.title"></h1>
+  <p class="mb-8 font-light lg:text-xl" @text="question.description"></p>
+
+  <!-- Form type fieldset -->
+  <div webc:if="question.type === 'form'">
+    <div class="grid gap-5 my-6 grid-cols-1">
+      <div webc:for="field of question.fields">
+        <fb-form-field :type="field.type" :label="field.label" :id="field.id" :placeholder="field.placeholder"
+          :required="field.required"></fb-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Radio type fieldset -->
+  <div webc:if="question.type === 'radio'">
+    <ul class="grid w-full gap-6 md:grid-cols-2 my-6">
+      <div webc:for="option of question.options">
+        <fb-radio-option :id="option.id" :label="option.label" :name="`${parseInt(question.id)}`"></fb-radio-option>
+      </div>
+    </ul>
+  </div>
+
+  <!-- Navigation buttons -->
+  <div class="flex space-x-3">
+    <x webc:if="parseInt(question.id) !== 1" webc:root>
+      <label :for="`${parseInt(question.id) - 1}-radio`"
+        class="text-center items-center w-full py-2.5 sm:py-3.5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+        @text="`Prev: ${prev}`">
+      </label>
+    </x>
+    <x webc:if="parseInt(question.id) !== questions.length" webc:root>
+      <label :for="`${parseInt(question.id) + 1}-radio`"
+        class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 sm:py-3.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        @text="`Next: ${next}`">
+      </label>
+    </x>
+    <x webc:if="parseInt(question.id) === questions.length" webc:root>
+      <button type="submit"
+        class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 sm:py-3.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        @text="`Submit and Finish`">
+      </button>
+    </x>
+  </div>
+</fieldset>

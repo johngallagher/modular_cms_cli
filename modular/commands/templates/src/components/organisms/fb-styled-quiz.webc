@@ -1,0 +1,191 @@
+<style>
+  .question {
+    display: none;
+  }
+
+  /* Show the question corresponding to the checked radio button */
+  [data-question="1"]:checked~[data-question="1"],
+  [data-question="2"]:checked~[data-question="2"],
+  [data-question="3"]:checked~[data-question="3"],
+  [data-question="4"]:checked~[data-question="4"],
+  [data-question="5"]:checked~[data-question="5"],
+  [data-question="6"]:checked~[data-question="6"],
+  [data-question="7"]:checked~[data-question="7"],
+  [data-question="8"]:checked~[data-question="8"],
+  [data-question="9"]:checked~[data-question="9"],
+  [data-question="10"]:checked~[data-question="10"] {
+    display: block;
+  }
+
+  .navigation {
+    margin-top: 1rem;
+  }
+
+  label.button {
+    margin-right: 0.5rem;
+    text-decoration: none;
+    background: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  label.button[disabled] {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  label.button:hover {
+    background: #0056b3;
+  }
+
+  input:user-invalid {
+    border: 1px solid red;
+  }
+
+  /* Disable "Next" button when the current question's input is invalid */
+  fieldset.question[data-question="1"]:invalid label[for="2-radio"],
+  fieldset.question[data-question="2"]:invalid label[for="3-radio"],
+  fieldset.question[data-question="3"]:invalid label[for="4-radio"],
+  fieldset.question[data-question="4"]:invalid label[for="5-radio"],
+  fieldset.question[data-question="5"]:invalid label[for="6-radio"],
+  fieldset.question[data-question="6"]:invalid label[for="7-radio"],
+  fieldset.question[data-question="7"]:invalid label[for="8-radio"],
+  fieldset.question[data-question="8"]:invalid label[for="9-radio"],
+  fieldset.question[data-question="9"]:invalid label[for="10-radio"] {
+    background: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Hide radio buttons but keep their functionality */
+  input[name="stage"] {
+    display: none;
+  }
+
+  /* Progress bar container */
+  .progress-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+    width: 100%;
+  }
+
+  /* Line connecting the steps */
+  .progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ccc;
+    z-index: 1;
+  }
+
+  /* Individual step indicators */
+  .step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Active and completed states */
+  [data-question="1"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="2"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="2"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="3"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="3"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="3"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="4"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="4"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="4"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="4"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="5"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="5"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="5"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="5"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="5"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="6"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="6"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="6"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="6"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="6"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="6"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="6"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="7"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="6"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="7"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="8"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="6"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="7"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="8"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="9"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="6"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="7"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="8"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="9"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="10"] {
+    border-color: #007bff;
+    background: #007bff;
+    color: white;
+  }
+
+  /* Current step */
+  [data-question="1"]:checked~.progress-bar .step[data-step="1"],
+  [data-question="2"]:checked~.progress-bar .step[data-step="2"],
+  [data-question="3"]:checked~.progress-bar .step[data-step="3"],
+  [data-question="4"]:checked~.progress-bar .step[data-step="4"],
+  [data-question="5"]:checked~.progress-bar .step[data-step="5"],
+  [data-question="6"]:checked~.progress-bar .step[data-step="6"],
+  [data-question="7"]:checked~.progress-bar .step[data-step="7"],
+  [data-question="8"]:checked~.progress-bar .step[data-step="8"],
+  [data-question="9"]:checked~.progress-bar .step[data-step="9"],
+  [data-question="10"]:checked~.progress-bar .step[data-step="10"] {
+    background: #fff;
+    color: #007bff;
+  }
+</style>
+
+<section class="py-8 bg-white dark:bg-gray-900 lg:py-0">
+    <div class="py-8 px-4 mx-auto space-y-12 max-w-screen-xl lg:space-y-20 sm:py-16 lg:px-6">
+        <div class="w-full flex flex-col items-center justify-center">
+            <div class="w-full md:w-3/4">
+                <form name="quiz-form" netlify>
+                    <fb-progress-bar-with-bubbles :questions="object.questions" class="w-full md:w-3/4 my-6"></fb-progress-bar-with-bubbles>
+                    
+                    <fb-fieldset :question="question" :questions="object.questions" :prev="prevTitle(question, object.questions)" :next="nextTitle(question, object.questions)" webc:for="question of object.questions"></fb-fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

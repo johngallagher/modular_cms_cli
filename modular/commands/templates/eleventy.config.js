@@ -54,6 +54,21 @@ export default function (eleventyConfig) {
     return b.price - a.price;
   });
 
+  eleventyConfig.addJavaScriptFunction("nextTitle", function(question, questions) {
+    if (!question || !questions || !Array.isArray(questions)) {
+      return '';
+    }
+    const nextQuestion = questions.find(q => q && parseInt(q.id) === (parseInt(question.id) + 1));
+    return nextQuestion?.title || 'Submit and Finish';
+  });
+
+  eleventyConfig.addJavaScriptFunction("prevTitle", function(question, questions) {
+    if (!question || !questions || !Array.isArray(questions)) {
+      return '';
+    }
+    const prevQuestion = questions.find(q => q && parseInt(q.id) === (parseInt(question.id) - 1));
+    return prevQuestion?.title || 'Start';
+  });
 
   return {
     markdownTemplateEngine: "webc",

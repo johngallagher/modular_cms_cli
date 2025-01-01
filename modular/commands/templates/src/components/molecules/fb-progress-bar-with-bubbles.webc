@@ -1,0 +1,5 @@
+<input webc:for="question of questions" type="radio" name="stage" :id="`${question.id}-radio`" :data-question="question.id" :checked="parseInt(question.id) === 1">
+
+<div class="progress-bar">
+  <div webc:for="question of questions" class="step" :data-step="question.id" @text="question.id"></div>
+</div>
