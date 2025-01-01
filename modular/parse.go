@@ -36,6 +36,8 @@ func Parse(blockData map[string]interface{}) (BlockInterface, error) {
 		block = &TestimonialSectionsBlockquote{Type: typeStr}
 	case "SocialProofCardStatistics":
 		block = &SocialProofCardStatistics{Type: typeStr}
+	case "FeatureSectionsAlternate":
+		block = &FeatureSectionsAlternate{Type: typeStr}
 	default:
 		return nil, fmt.Errorf("unknown block type: %s", typeStr)
 	}
