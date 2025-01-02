@@ -180,6 +180,10 @@
     <div class="py-8 px-4 mx-auto space-y-12 max-w-screen-xl lg:space-y-20 sm:py-16 lg:px-6">
         <div class="w-full flex flex-col items-center justify-center">
             <div class="w-full md:w-3/4">
+                <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white"
+                  @text="object.heading">Work with
+                  tools you already use</h2>
+                <p class="mb-8 font-light lg:text-xl" @text="object.subheading">Deliver great service experiences fast - without the
                 <form name="quiz-form" netlify>
                     <fb-progress-bar-with-bubbles :questions="object.questions" class="w-full md:w-3/4 my-6"></fb-progress-bar-with-bubbles>
                     

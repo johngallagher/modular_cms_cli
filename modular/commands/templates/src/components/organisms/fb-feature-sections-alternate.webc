@@ -94,6 +94,12 @@
                           @text="object.right.feature_5">Knowledge
                           management</span>
                   </li>
+                  <li class="flex space-x-3" webc:if="object.right.feature_6">
+                      <fb-icon :name="object.right.sentiment === 'positive' ? 'solid-check-circle' : 'solid-close-circle'" :class="object.right.sentiment === 'positive' ? 'flex-shrink-0 w-5 h-5 text-green-600 dark:text-green-500' : 'flex-shrink-0 w-5 h-5 text-red-600 dark:text-red-500'"></fb-icon>
+                      <span class="text-base font-medium leading-tight text-gray-900 dark:text-white"
+                          @text="object.right.feature_6">Knowledge
+                          management</span>
+                  </li>
               </ul>
               <p class="font-light lg:text-xl" @text="object.right.footer">Deliver great service experiences fast - without the
                   complexity of
