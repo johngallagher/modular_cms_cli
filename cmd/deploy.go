@@ -102,6 +102,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 	}
 
 	if to == "netlify" {
+		fmt.Println("Deploying to Netlify...")
 		siteName := strings.ReplaceAll(repoName, "_", "-")
 		// Run netlify init command
 		netlifyCmd := exec.Command("netlify", "sites:create", "--name", siteName)
@@ -109,32 +110,37 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		netlifyCmd.Stderr = os.Stderr
 		netlifyCmd.Stdin = os.Stdin
 		if err := netlifyCmd.Run(); err != nil {
+			fmt.Printf("Error running netlify sites:create: %v\n", err)
 			return fmt.Errorf("failed to run netlify sites:create: %w", err)
 		}
 
+		fmt.Println("Initializing Netlify...")
 		netlifyCmd = exec.Command("netlify", "init")
 		netlifyCmd.Stdout = os.Stdout
 		netlifyCmd.Stderr = os.Stderr
 		netlifyCmd.Stdin = os.Stdin
 		if err := netlifyCmd.Run(); err != nil {
+			fmt.Printf("Error running netlify init: %v\n", err)
 			return fmt.Errorf("failed to run netlify init: %w", err)
 		}
 
-		// Push changes
+		fmt.Println("Pushing changes...")
 		gitPushCmd := exec.Command("git", "push", "-u", "origin", "main")
 		gitPushCmd.Stdout = os.Stdout
 		gitPushCmd.Stderr = os.Stderr
 		gitPushCmd.Stdin = os.Stdin
 		if err := gitPushCmd.Run(); err != nil {
+			fmt.Printf("Error pushing changes: %v\n", err)
 			return fmt.Errorf("failed to push changes: %w", err)
 		}
 
-		// Run netlify watch command
+		fmt.Println("Watching for changes...")
 		netlifyWatchCmd := exec.Command("netlify", "watch")
 		netlifyWatchCmd.Stdout = os.Stdout
 		netlifyWatchCmd.Stderr = os.Stderr
 		netlifyWatchCmd.Stdin = os.Stdin
 		if err := netlifyWatchCmd.Run(); err != nil {
+			fmt.Printf("Error running netlify watch: %v\n", err)
 			return fmt.Errorf("failed to run netlify watch: %w", err)
 		}
 	} else if to == "github" {
