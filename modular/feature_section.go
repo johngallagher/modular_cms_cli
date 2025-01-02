@@ -1,6 +1,7 @@
 package modular
 
 type FeatureSection struct {
+	Identifier  string    `yaml:"identifier"`
 	Type        string    `yaml:"type"`
 	HideFromNav bool      `yaml:"hide_from_nav"`
 	Heading     string    `yaml:"heading"`
@@ -43,7 +44,7 @@ func (b *FeatureSection) SetFeatures(features []Feature) {
 }
 
 func (b FeatureSection) ID() string {
-	return "feature_section_" + b.View
+	return b.Identifier
 }
 
 func (b *FeatureSection) GetFieldDefinitions() []*FieldDefinition {

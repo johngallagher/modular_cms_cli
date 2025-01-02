@@ -2,6 +2,25 @@ package modular
 
 func AllBlocks() []BlockInterface {
 	return []BlockInterface{
+		&HeroSectionsDefault{
+			Type:        "HeroSectionsDefault",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Hero Section",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+			Left: SideJustCTA{
+				CTA: CTA{
+					Text: "Learn More Today",
+					URL:  "#",
+				},
+			},
+			Right: SideJustCTA{
+				CTA: CTA{
+					Text: "Learn More Today",
+					URL:  "#",
+				},
+			},
+		},
 		&MarketingHeroCoverImageWithCtas{
 			Type:        "MarketingHeroCoverImageWithCtas",
 			HideFromNav: true,
@@ -28,6 +47,33 @@ func AllBlocks() []BlockInterface {
 			},
 		},
 		&FeatureSection{
+			Identifier:  "feature_section_cta_list_1",
+			Type:        "FeatureSection",
+			Library:     "FlowBite",
+			View:        "cta-list",
+			Heading:     "The most trusted cryptocurrency platform",
+			HideFromNav: false,
+			Subheading:  "Here are a few reasons why you should choose Flowbite",
+			Features: []Feature{
+				{
+					Heading: "Secure storage",
+					Summary: "We store the vast majority of the digital assets in secure offline storage.",
+					Icon:    "solid-wand-magic-sparkles",
+				},
+				{
+					Heading: "Insurance",
+					Summary: "Flowbite maintains crypto insurance and all USD cash balances are covered.",
+					Icon:    "solid-award",
+				},
+				{
+					Heading: "Best Practices",
+					Summary: "Flowbite marketplace supports a variety of the most popular digital currencies.",
+					Icon:    "solid-badge-check",
+				},
+			},
+		},
+		&FeatureSection{
+			Identifier:  "feature_section_cta_list_2",
 			Type:        "FeatureSection",
 			Library:     "FlowBite",
 			View:        "cta-list",
@@ -106,79 +152,6 @@ func AllBlocks() []BlockInterface {
 				},
 			},
 		},
-		&PricingTable{
-			Type:          "PricingTable",
-			HideFromNav:   false,
-			Library:       "FlowBite",
-			Heading:       "Pricing Plans",
-			Subheading:    "Flexible pricing for all teams and budgets.",
-			ProductLineID: "observability_workshop_1",
-		},
-		&ContactFormsDefault{
-			Type:        "ContactFormsDefault",
-			HideFromNav: false,
-			Library:     "FlowBite",
-			Heading:     "Contact us",
-			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
-		},
-		&HeroSectionsDefault{
-			Type:        "HeroSectionsDefault",
-			HideFromNav: false,
-			Library:     "FlowBite",
-			Heading:     "Hero Section",
-			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
-			Left: SideJustCTA{
-				CTA: CTA{
-					Text: "Learn More Today",
-					URL:  "#",
-				},
-			},
-			Right: SideJustCTA{
-				CTA: CTA{
-					Text: "Learn More Today",
-					URL:  "#",
-				},
-			},
-		},
-		&TestimonialSectionsBlockquote{
-			Type:        "TestimonialSectionsBlockquote",
-			HideFromNav: false,
-			Library:     "FlowBite",
-			Testimonial: Testimonial{
-				Content: "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
-				Author: Author{
-					Name:     "Micheal Gough",
-					Title:    "CEO at Google",
-					ImageSrc: "https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gouch.png",
-				},
-			},
-		},
-		&SocialProofCardStatistics{
-			Type:        "SocialProofCardStatistics",
-			HideFromNav: false,
-			Library:     "FlowBite",
-			Heading:     "Social Proof Card Statistics",
-			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
-			Note:        "Results based on a composite organization of 1,800 developers using GitHub over three years.",
-			Sentiment:   "neutral",
-			Statistics: Statistics{
-				Left: Statistic{
-					Value:       "40%",
-					Title:       "Reduction",
-					Description: "in developer onboarding time",
-				},
-				Center: Statistic{
-					Value:       "469%",
-					Title:       "Return on investment",
-					Description: "over 3 years",
-				},
-				Right: Statistic{
-					Value:       "60+",
-					Title:       "Minutes saved",
-					Description: "per developer, per day",
-				},
-			},
-		},
 		&FeatureSectionsAlternate{
 			Type:        "FeatureSectionsAlternate",
 			HideFromNav: false,
@@ -208,7 +181,105 @@ func AllBlocks() []BlockInterface {
 				Feature6:   "Feature 6",
 			},
 		},
+		&PricingTable{
+			Type:          "PricingTable",
+			HideFromNav:   false,
+			Library:       "FlowBite",
+			Heading:       "Pricing Plans",
+			Subheading:    "Flexible pricing for all teams and budgets.",
+			ProductLineID: "observability_workshop_1",
+		},
+		&ContactFormsDefault{
+			Type:        "ContactFormsDefault",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Contact us",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+		},
+		&TestimonialSectionsBlockquote{
+			Identifier:  "testimonial_sections_blockquote_1",
+			Type:        "TestimonialSectionsBlockquote",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Testimonial: Testimonial{
+				Content: "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+				Author: Author{
+					Name:     "Micheal Gough",
+					Title:    "CEO at Google",
+					ImageSrc: "https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gouch.png",
+				},
+			},
+		},
+		&TestimonialSectionsBlockquote{
+			Identifier:  "testimonial_sections_blockquote_2",
+			Type:        "TestimonialSectionsBlockquote",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Testimonial: Testimonial{
+				Content: "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+				Author: Author{
+					Name:     "Micheal Gough",
+					Title:    "CEO at Google",
+					ImageSrc: "https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gouch.png",
+				},
+			},
+		},
+		&SocialProofCardStatistics{
+			Identifier:  "social_proof_card_statistics_negative",
+			Type:        "SocialProofCardStatistics",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Social Proof Card Statistics",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+			Note:        "Results based on a composite organization of 1,800 developers using GitHub over three years.",
+			Sentiment:   "negative",
+			Statistics: Statistics{
+				Left: Statistic{
+					Value:       "40%",
+					Title:       "Reduction",
+					Description: "in developer onboarding time",
+				},
+				Center: Statistic{
+					Value:       "469%",
+					Title:       "Return on investment",
+					Description: "over 3 years",
+				},
+				Right: Statistic{
+					Value:       "60+",
+					Title:       "Minutes saved",
+					Description: "per developer, per day",
+				},
+			},
+		},
+		&SocialProofCardStatistics{
+			Identifier:  "social_proof_card_statistics_positive",
+			Type:        "SocialProofCardStatistics",
+			HideFromNav: false,
+			Library:     "FlowBite",
+			Heading:     "Social Proof Card Statistics",
+			Subheading:  "We are a team of developers and designers who are passionate about creating beautiful and functional websites.",
+			Note:        "Results based on a composite organization of 1,800 developers using GitHub over three years.",
+			Sentiment:   "positive",
+			Statistics: Statistics{
+				Left: Statistic{
+					Value:       "40%",
+					Title:       "Reduction",
+					Description: "in developer onboarding time",
+				},
+				Center: Statistic{
+					Value:       "469%",
+					Title:       "Return on investment",
+					Description: "over 3 years",
+				},
+				Right: Statistic{
+					Value:       "60+",
+					Title:       "Minutes saved",
+					Description: "per developer, per day",
+				},
+			},
+		},
 		&StyledQuiz{
+			Identifier:  "styled_quiz_windows_container_ci_solution_finder",
 			Type:        "StyledQuiz",
 			HideFromNav: false,
 			Library:     "FlowBite",
@@ -324,6 +395,7 @@ func AllBlocks() []BlockInterface {
 			},
 		},
 		&StyledQuiz{
+			Identifier:  "styled_quiz_modular",
 			Type:        "StyledQuiz",
 			HideFromNav: false,
 			Library:     "FlowBite",

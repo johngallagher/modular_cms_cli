@@ -1,6 +1,7 @@
 package modular
 
 type TestimonialSectionsBlockquote struct {
+	Identifier  string      `yaml:"identifier"`
 	Type        string      `yaml:"type"`
 	HideFromNav bool        `yaml:"hide_from_nav"`
 	Library     string      `yaml:"library"`
@@ -58,7 +59,7 @@ func (t *TestimonialSectionsBlockquote) SetFeatures(features []Feature) {
 	// No-op since this block type doesn't use features
 }
 func (t *TestimonialSectionsBlockquote) ID() string {
-	return "testimonial_cards"
+	return t.Identifier
 }
 
 func (t *TestimonialSectionsBlockquote) GetFieldDefinitions() []*FieldDefinition {

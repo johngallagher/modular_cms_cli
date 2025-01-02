@@ -1,6 +1,7 @@
 package modular
 
 type StyledQuiz struct {
+	Identifier  string         `yaml:"identifier"`
 	Type        string         `yaml:"type"`
 	HideFromNav bool           `yaml:"hide_from_nav"`
 	Library     string         `yaml:"library"`
@@ -71,7 +72,7 @@ func (q *StyledQuiz) SetFeatures(features []Feature) {
 }
 
 func (q *StyledQuiz) ID() string {
-	return "styled_quiz"
+	return q.Identifier
 }
 
 func (q *StyledQuiz) GetFieldDefinitions() []*FieldDefinition {

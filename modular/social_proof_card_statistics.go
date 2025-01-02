@@ -1,6 +1,7 @@
 package modular
 
 type SocialProofCardStatistics struct {
+	Identifier  string     `yaml:"identifier"`
 	Type        string     `yaml:"type"`
 	HideFromNav bool       `yaml:"hide_from_nav"`
 	Library     string     `yaml:"library"`
@@ -64,7 +65,7 @@ func (t *SocialProofCardStatistics) SetFeatures(features []Feature) {
 	// No-op since this block type doesn't use features
 }
 func (t *SocialProofCardStatistics) ID() string {
-	return "social_proof_card_statistics"
+	return t.Identifier
 }
 
 func (t *SocialProofCardStatistics) GetFieldDefinitions() []*FieldDefinition {
