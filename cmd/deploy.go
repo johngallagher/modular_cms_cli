@@ -58,6 +58,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		githubClientID := "Ov23likuN3kpIirlvEv0"
 		deviceCode, err := getGitHubDeviceCode(githubClientID)
 		if err != nil {
+			fmt.Printf("Error getting device code: %v\n", err)
 			return fmt.Errorf("failed to get device code: %w", err)
 		}
 
@@ -67,6 +68,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		// Poll for GitHub token
 		githubToken, err := pollForGitHubToken(githubClientID, deviceCode)
 		if err != nil {
+			fmt.Printf("Error polling for GitHub token: %v\n", err)
 			return fmt.Errorf("failed to get GitHub token: %w", err)
 		}
 
@@ -80,6 +82,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 			Private: &[]bool{true}[0],
 		})
 		if err != nil {
+			fmt.Printf("Error creating repository: %v\n", err)
 			return fmt.Errorf("failed to create repository: %w", err)
 		}
 
@@ -87,12 +90,14 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 
 		// Initialize git and push
 		if err := initAndPushToGitHub(*repo.SSHURL); err != nil {
+			fmt.Printf("Error initializing and pushing to GitHub: %v\n", err)
 			return fmt.Errorf("failed to initialize and push to GitHub: %w", err)
 		}
 	}
 
 	to, err := cmd.Flags().GetString("to")
 	if err != nil {
+		fmt.Printf("Error getting 'to' flag: %v\n", err)
 		return fmt.Errorf("failed to get 'to' flag: %w", err)
 	}
 
@@ -132,8 +137,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		if err := netlifyWatchCmd.Run(); err != nil {
 			return fmt.Errorf("failed to run netlify watch: %w", err)
 		}
-	}
-	if to == "github" {
+	} else if to == "github" {
 		// Run build command
 		buildCmd := exec.Command("bin/build")
 		buildCmd.Stdout = os.Stdout
@@ -217,6 +221,9 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		}
 
 		fmt.Printf("\nEnabled GitHub Pages for repository. Site will be available at https://%s.github.io/%s\n", owner, repoName)
+	} else {
+		fmt.Printf("Invalid provider %q - must be either 'netlify' or 'github'", to)
+		return fmt.Errorf("invalid provider %q - must be either 'netlify' or 'github'", to)
 	}
 	return nil
 }

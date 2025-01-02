@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-go build -o modular_cli .
+GOOS=linux GOARCH=amd64 go build -o modular_cli .
 
 sudo mv modular_cli /usr/local/bin/modular_cli
